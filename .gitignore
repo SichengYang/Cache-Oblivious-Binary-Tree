@@ -1,4 +1,2 @@
 # Ignore executable files
-*.exe
-*.out
-*.o
+*
