@@ -8,18 +8,17 @@ template <typename T>
 class Node
 {
 public:
-    T *data; // Data stored in the node
+    T data; // Data stored in the node
 
     int height;     // Height of the node in the tree
-    int min;        // Min children allowed
-    int max;        // Max children allowed
     int childCount; // Number of children
 
-    Node *left;
-    Node *right;
-    Node *parent;
+    // Because the realloation may change the address of the node, we need to store the index of the node in the array
+    int left;
+    int right;
+    int parent;
 
-    Node(T *value); // The data itself is in PackMemoryArray, so we just need to store the pointer to it
+    Node(T value, int height);
 };
 
 #include "Node.tpp"
