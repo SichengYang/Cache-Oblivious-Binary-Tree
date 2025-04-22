@@ -18,7 +18,7 @@ public:
     int right;
     int parent;
 
-    Node(T value, int height);
+    Node(T value, int height); // Constructor to initialize the node with a value and height
 };
 
 #include "Node.tpp"
