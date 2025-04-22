@@ -15,7 +15,7 @@ public:
 
     int size;
     int capacity;
-
+    int * array;
     void resize(); // Function to resize if space is limited
 
     PackMemoryArray(); // Constructor to initialize the array with a default total size of 30
@@ -24,8 +24,8 @@ public:
     T *add(T value);
     T *remove(T value);
     int getSize();
-
     T *operator[](int index);
+    
 };
 
 #include "PackMemoryArray.tpp"
