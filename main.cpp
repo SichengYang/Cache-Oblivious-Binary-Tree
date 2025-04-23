@@ -4,8 +4,10 @@
 void insert_to_tree(BTree<int>* tree, int num)
 {
     int index = tree->insert(num);
-    cout << "Inserted 10 at index: " << index << std::endl;
+    cout << "Inserted " << num << " at index: " << index << std::endl;
+    tree->print_array();
     tree->print_tree();
+    cout << "------------------------" << endl;
     cout << endl;
 }
 
@@ -18,5 +20,12 @@ int main()
     insert_to_tree(&tree, 15);
     insert_to_tree(&tree, 25);
     insert_to_tree(&tree, 30);
+    insert_to_tree(&tree, 18);
+    insert_to_tree(&tree, 1);
+    insert_to_tree(&tree, 7);
+    insert_to_tree(&tree, 3);
+    insert_to_tree(&tree, 4);
+    insert_to_tree(&tree, -1);
+    insert_to_tree(&tree, -4);
     return 0;
 }

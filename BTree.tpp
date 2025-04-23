@@ -24,6 +24,24 @@ void BTree<T>::merge(Node<T> *node)
 template <typename T>
 void BTree<T>::shift_right(int index, int right_index)
 {
+    cout << "shifting right from index: " << index << " by " << right_index << endl;
+    int start = array[array[array[index].parent].parent].left;
+    // shift all elements to the right by 3 elements
+    for (int i = start; i < array.size(); i += 1)
+    {
+        if (array[i].parent >= index)
+        {
+            array[i].parent += right_index;
+        }
+        if (array[i].left >= index)
+        {
+            array[i].left += right_index;
+        }
+        if (array[i].right >= index)
+        {
+            array[i].right += right_index;
+        }
+    }
 }
 
 template <typename T>
@@ -56,8 +74,12 @@ int BTree<T>::left_insert(T value, int parent, int current)
         }
     }
 
+    shift_right(insert_after_index + 1, 3); // shift everything to the right by 3 elements since we inserted 3 new nodes
+
     // insert new node in the array after the right element of parent
-    auto pos = array.insert(array.begin() + insert_after_index + 1, Node<T>(value, insert_height));
+    Node<T> new_node(value, insert_height);
+    new_node.parent = parent;
+    auto pos = array.insert(array.begin() + insert_after_index + 1, new_node);
     int index = pos - array.begin();
     array[parent].left = index;
 
@@ -107,8 +129,12 @@ int BTree<T>::right_insert(T value, int parent, int current)
         }
     }
 
+    shift_right(insert_after_index + 1, 3); // shift everything to the right by 3 elements since we inserted 3 new nodes
+
     // insert new node next to the parent (right of the previous parent)
-    auto pos = array.insert(array.begin() + insert_after_index + 1, Node<T>(value, insert_height));
+    Node<T> new_node(value, insert_height);
+    new_node.parent = parent;
+    auto pos = array.insert(array.begin() + insert_after_index + 1, new_node);
     int index = pos - array.begin();
     array[parent].right = index;
 
@@ -200,7 +226,7 @@ int BTree<T>::insert(T value)
 
         auto right_pos = array.insert(array.begin() + insert_index + 2, right);
         array[insert_index].right = right_pos - array.begin();
-        
+
         cout << "insert children at index: " << array[insert_index].left << " and " << array[insert_index].right << endl;
     }
 
@@ -208,6 +234,10 @@ int BTree<T>::insert(T value)
     {
         leave_height = insert_height;
     }
+
+    cout << "Parent: " << array[insert_index].parent << endl;
+    cout << "Left: " << array[insert_index].left << endl;
+    cout << "Right: " << array[insert_index].right << endl;
 
     return insert_index; // return -1 if insertion fails
 }
@@ -224,7 +254,7 @@ int BTree<T>::search(T value)
 }
 
 template <typename T>
-void BTree<T>::print_tree()
+void BTree<T>::print_array()
 {
     cout << "Array: ";
     for (int i = 0; i < array.size(); ++i)
@@ -232,12 +262,21 @@ void BTree<T>::print_tree()
         cout << array[i].data << " ";
     }
     cout << endl;
+}
 
+template <typename T>
+void BTree<T>::print_tree()
+{
     vector<int> parents;
     vector<int> children;
     if (root != -1)
     {
-        cout << "Root:      " << setw(4) << array[root].data << endl;
+        cout << "Root:      ";
+        for (int i = 0; i < 100 - leave_height; ++i)
+        {
+            cout << "    ";
+        }
+        cout << setw(4) << array[root].data << endl;
         parents.push_back(root);
         if (array[parents[0]].left != -1)
         {
@@ -257,9 +296,18 @@ void BTree<T>::print_tree()
     while (!children.empty())
     {
         cout << "Level " << level << ": ";
+        for (int i = 0; i < array[children[0]].height - leave_height; ++i)
+        {
+            cout << "    ";
+        }
+
         for (int i = 0; i < children.size(); ++i)
         {
-            cout << setw(4) << array[children[i]].data << " ";
+            cout << setw(4) << array[children[i]].data;
+            for (int j = 0; j < array[children[i]].height - leave_height; ++j)
+            {
+                cout << "  ";
+            }
         }
         cout << endl;
 
@@ -276,6 +324,7 @@ void BTree<T>::print_tree()
                 children.push_back(array[parents[i]].right);
             }
         }
+        level += 1;
     }
 }
 

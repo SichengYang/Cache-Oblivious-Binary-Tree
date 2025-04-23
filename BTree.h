@@ -44,6 +44,7 @@ public:
     int search(T value);
 
     void print_tree(); // Function to print the tree structure (for debugging purposes)
+    void print_array(); // Function to print the array structure (for debugging purposes)
 
     class Iterator
     {
