@@ -46,6 +46,7 @@ int main()
     remove_from_tree(&tree, 3);
     remove_from_tree(&tree, 20);
     remove_from_tree(&tree, 30);
+    remove_from_tree(&tree, -100);
 
     return 0;
 }
