@@ -27,7 +27,7 @@ void BTree<T>::shift_right(int index, int right_index)
     cout << "shifting right from index: " << index << " by " << right_index << endl;
     int start = array[array[array[index].parent].parent].left;
     // shift all elements to the right by 3 elements
-    for (int i = start; i < array.size(); i += 1)
+    for (int i = 0; i < array.size(); i += 1)
     {
         if (array[i].parent >= index)
         {
@@ -245,12 +245,73 @@ int BTree<T>::insert(T value)
 template <typename T>
 void BTree<T>::remove(T value)
 {
+    int index = search(value);
+    if (index == -1)
+    {
+        cout << "Value not found in the tree." << endl;
+        return;
+    }
+    else
+    {
+        int current = index;
+        while (current != -1)
+        {
+            // This means both children is valid
+            if (array[current].left != -1 && array[current].right != -1)
+            {
+                if(array[array[current].left].childCount > array[array[current].right].childCount)
+                {
+                    array[current].data = array[array[current].left].data;
+                    current = array[current].left;
+                }
+                else
+                {
+                    array[current].data = array[array[current].right].data;
+                    current = array[current].right;
+                }
+            }
+            else if (array[current].left == -1 && array[current].right != -1)
+            {
+                array[current].data = array[array[current].right].data;
+                current = array[current].right;
+            }
+            else if (array[current].left != -1 && array[current].right == -1)
+            {
+                array[current].data = array[array[current].left].data;
+                current = array[current].left;
+            }
+            else
+            {
+                array[current].data = 0;
+                array[current].parent = -1;
+                break;
+            }
+        }
+    }
 }
 
+// This function will return the index of element if found, otherwise -1
 template <typename T>
 int BTree<T>::search(T value)
 {
-    return 0;
+    int current = root;
+    while (current != -1)
+    {
+        if (array[current].data == value)
+        {
+            return current;
+        }
+        else if (value < array[current].data)
+        {
+            current = array[current].left;
+        }
+        else
+        {
+            current = array[current].right;
+        }
+    }
+
+    return -1;
 }
 
 template <typename T>
