@@ -12,13 +12,9 @@ template <typename T>
 BTree<T>::~BTree() {}
 
 template <typename T>
-void BTree<T>::split(Node<T> *node)
+void BTree<T>::rebalance(int index)
 {
-}
-
-template <typename T>
-void BTree<T>::merge(Node<T> *node)
-{
+    
 }
 
 template <typename T>

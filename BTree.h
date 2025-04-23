@@ -28,8 +28,7 @@ class BTree
     // PackMemoryArray<T> array; // uncomment if finished
 
     // Function to rebalance the tree after insertion or deletion
-    void split(Node<T> *node); // Function to split a node when it exceeds the maximum number of children
-    void merge(Node<T> *node); // Function to merge nodes when the number of children is less than the minimum required
+    void rebalance(int index);
 
     void shift_right(int index, int right_index); // Function to shift elements to the right in the array
     int left_insert(T value, int parrent, int current); // Function to insert a new node int the left subtree
