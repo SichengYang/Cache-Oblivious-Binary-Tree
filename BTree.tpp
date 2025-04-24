@@ -11,6 +11,7 @@ BTree<T>::BTree() : root(-1), leave_height(100) {}
 template <typename T>
 BTree<T>::~BTree() {}
 
+// Balance the node if the node is not within 2^h/4 < childCount < 2^h
 template <typename T>
 void BTree<T>::rebalance(int index)
 {
@@ -241,7 +242,28 @@ int BTree<T>::insert(T value)
 template <typename T>
 void BTree<T>::remove(T value)
 {
-    int index = search(value);
+    int index = -1;
+
+    int current = root;
+    while (current != -1)
+    {
+        if (array[current].childCount != 0)
+            array[current].childCount--;
+        if (array[current].data == value)
+        {
+            index = current;
+            break;
+        }
+        else if (value < array[current].data)
+        {
+            current = array[current].left;
+        }
+        else
+        {
+            current = array[current].right;
+        }
+    }
+
     if (index == -1)
     {
         cout << "Value not found in the tree." << endl;
@@ -255,6 +277,13 @@ void BTree<T>::remove(T value)
             // This means both children is valid
             if (array[current].left != -1 && array[current].right != -1)
             {
+                if(array[array[current].left].parent == -1 && array[array[current].right].parent == -1)
+                {
+                    array[current].data = -1;
+                    array[current].parent = -1;
+                    break;
+                }
+
                 if(array[array[current].left].childCount > array[array[current].right].childCount)
                 {
                     array[current].data = array[array[current].left].data;
@@ -278,7 +307,7 @@ void BTree<T>::remove(T value)
             }
             else
             {
-                array[current].data = 0;
+                array[current].data = -1;
                 array[current].parent = -1;
                 break;
             }
@@ -333,7 +362,7 @@ void BTree<T>::print_tree()
         {
             cout << "    ";
         }
-        cout << setw(4) << array[root].data << endl;
+        cout << setw(4) << array[root].data << "(" << array[root].height << ", " << array[root].childCount << ")" << endl;
         parents.push_back(root);
         if (array[parents[0]].left != -1)
         {
@@ -361,6 +390,8 @@ void BTree<T>::print_tree()
         for (int i = 0; i < children.size(); ++i)
         {
             cout << setw(4) << array[children[i]].data;
+            if (array[children[i]].parent != -1) 
+                cout << "(" << array[children[i]].height << ", " << array[children[i]].childCount << ")";
             for (int j = 0; j < array[children[i]].height - leave_height; ++j)
             {
                 cout << "  ";

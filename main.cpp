@@ -37,7 +37,6 @@ int main()
     insert_to_tree(&tree, 4);
     insert_to_tree(&tree, -1);
     insert_to_tree(&tree, -4);
-    insert_to_tree(&tree, 0);
 
     cout << "Index of 20: " << tree.search(20) << endl;
     cout << "Index of 7: " << tree.search(7) << endl;
