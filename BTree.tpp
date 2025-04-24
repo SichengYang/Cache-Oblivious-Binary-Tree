@@ -422,7 +422,7 @@ BTree<T>::Iterator::Iterator() : index(0) {}
 template <typename T>
 bool BTree<T>::Iterator::hasNext()
 {
-    return index < array.getSize();
+    return index < array.size();
 }
 
 template <typename T>
