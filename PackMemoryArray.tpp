@@ -30,7 +30,7 @@ T *PackMemoryArray<T>::add(T value)
     if(search(value)==-1){
         size++;
         resize();
-        //我再研究一下这个add
+        //我再研究一下这个add.
     }
     //If the operation causes the array needs to be resized
     else{
