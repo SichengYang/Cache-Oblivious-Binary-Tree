@@ -22,10 +22,10 @@ public:
     ~PackMemoryArray();
 
     T *add(T value);
-    T *remove(T value);
+    int *remove(T value);
     int getSize();
     T *operator[](int index);
-    
+    int *search(T value);
 };
 
 #include "PackMemoryArray.tpp"
