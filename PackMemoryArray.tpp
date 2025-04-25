@@ -2,10 +2,13 @@
 
 template <typename T>
 PackMemoryArray<T>::PackMemoryArray()
-    : size(0)
-    : capacity(10)
+    : nelems(0)
+    : segment_size(10)
+    : nchunks(0)
+    : nlevels(0) 
 {
-    array=new int[10];
+    store=new T[10];
+    exist=new T[10];
 
 }
 
@@ -30,6 +33,9 @@ T *PackMemoryArray<T>::add(T value)
     }
 }
 
+int *PackMemoryArray<T>::decide_segment(T value){
+
+}
 //Binary Search
 template <typename T>
 int *PackMemoryArray<T>::search(T value){
@@ -48,9 +54,9 @@ int *PackMemoryArray<T>::search(T value){
 }
 
 template <typename T>
-int *PackMemoryArray<T>::remove(T value)
+T *PackMemoryArray<T>::remove(T value)
 {
-    int temp=0;
+    T temp;
     int index=search(value);
     if(index!=-1){
         array[mid]=-1;

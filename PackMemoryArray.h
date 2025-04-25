@@ -10,21 +10,39 @@ template <typename T>
 class PackMemoryArray
 {
 public:
-    T *top_array;     // Pointer to the top array which size is sqrt(n)
-    T **bottom_array; // Pointer to the bottom array which size is n * [sqrt(n)]
-
-    int size;
-    int capacity;
-    int * array;
-    void resize(); // Function to resize if space is limited
-
-    PackMemoryArray(); // Constructor to initialize the array with a default total size of 30
+//Variables:
+    // # of element in the array
+    int ncount;
+    // Segment size
+    int segment_size;
+    // TKTK
+    int nchunks;
+    int nlevels; 
+//Arrays:
+    // Array that stores the value
+    T * store;
+    // Array that indicate if the element is valid
+    bool * exist;
+    
+//Constructors:
+    PackMemoryArray(); // Default size
+    PackMemoryArray(T* v_T); //Constructor with array
     ~PackMemoryArray();
-
+    //Operation:Insert, Remove, Get by index
     T *add(T value);
-    int *remove(T value);
-    int getSize();
+    T *remove(T value);
     T *operator[](int index);
+    // Get variables
+    int getNcount();
+    int getSegment_size();
+    int printPMA();
+private:
+// Supprting Functions
+    void resize(); // Function to resize if space is limited
+    void relanace();
+    int getSize(); //TKTK: do we really need this?
+    T *decide_segment[](T value);
+    // Search
     int *search(T value);
 };
 
