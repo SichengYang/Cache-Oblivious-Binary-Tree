@@ -26,7 +26,7 @@ public:
     
 //Constructors:
     PackMemoryArray(); // Default size
-    PackMemoryArray(T* v_T); //Constructor with array
+    PackMemoryArray(T* v_store, bool* v_exist, int ncount, int segment_size, int nchunks, int nlevels); //Constructor with array
     ~PackMemoryArray();
     //Operation:Insert, Remove, Get by index
     T *add(T value);
@@ -41,7 +41,7 @@ private:
     void resize(); // Function to resize if space is limited
     void relanace();
     int getSize(); //TKTK: do we really need this?
-    T *decide_segment[](T value);
+    int *decide_segment(T value);
     // Search
     int *search(T value);
 };
