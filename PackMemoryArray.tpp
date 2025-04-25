@@ -13,15 +13,7 @@ PackMemoryArray<T>::PackMemoryArray()
 template <typename T>
 PackMemoryArray<T>::~PackMemoryArray()
 {
-    delete[] top_array;
-
-    // Free the double pointer bottom array
-    for (int i = 0; i < size; ++i)
-    {
-        delete[] bottom_array[i];
-    }
-
-    delete[] bottom_array;
+    delete[] array;
 }
 
 template <typename T>
