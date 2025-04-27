@@ -11,16 +11,117 @@ BTree<T>::BTree() : root(-1), leave_height(100) {}
 template <typename T>
 BTree<T>::~BTree() {}
 
-// Balance the node if the node is not within 2^h/4 < childCount < 2^h
+// Balance the node by checking differene between left and right child. According to the paper, the difference between the left and right should be within the factor of 4 (for binary tree, we choose d = 2).
+template <typename T>
+void BTree<T>::rebalance_helper(int index)
+{
+    // if it is a leaf node, do nothing
+    if (array[index].childCount <= 1)
+    {
+        return;
+    }
+
+    // if the left or right is empty and the parent has more than 2 children, this is not a balanced node
+    // this case is specially treated to avoid divition by zero
+    if (!is_valid_node(array[index].left))
+    {
+        int balance_count = (array[array[index].right].childCount + 1) / 2;
+        for (int i = 0; i < balance_count; i++)
+        {
+            int data = array[index].data;
+            remove_helper(data);
+            insert_helper(data);
+        }
+        return;
+    }
+    else if (!is_valid_node(array[index].right))
+    {
+        int balance_count = (array[array[index].left].childCount + 1) / 2;
+        for (int i = 0; i < balance_count; i++)
+        {
+            int data = array[index].data;
+            remove_helper(data);
+            insert_helper(data);
+        }
+        return;
+    }
+
+    int left_child = array[array[index].left].childCount + 1;
+    int right_child = array[array[index].right].childCount + 1;
+    int average = array[index].childCount / 2;
+    if (left_child > right_child + 1 || left_child + 1 < right_child)
+    {
+        int balance_count = 0;
+        if (left_child > right_child)
+        {
+            balance_count = left_child - average;
+        }
+        else
+        {
+            balance_count = right_child - average;
+        }
+
+        for (int i = 0; i < balance_count; i++)
+        {
+            int data = array[index].data;
+            remove_helper(data);
+            insert_helper(data);
+        }
+    }
+
+    if (array[index].left != -1)
+        rebalance_helper(array[index].left);
+    if (array[index].right != -1)
+        rebalance_helper(array[index].right);
+}
+
 template <typename T>
 void BTree<T>::rebalance(int index)
 {
+    if (index == -1)
+    {
+        return;
+    }
+
+    int current = index;
+    bool need_rebalance = false;
+    while (current != root)
+    {
+        int parent = array[current].parent;
+
+        if (!is_valid_node(array[parent].left) && array[array[parent].right].childCount >= 1)
+        {
+            current = parent;
+            need_rebalance = true;
+            break;
+        }
+
+        if (!is_valid_node(array[parent].right) && array[array[parent].left].childCount >= 1)
+        {
+            current = parent;
+            need_rebalance = true;
+            break;
+        }
+
+        int left_count = array[array[parent].left].childCount + 1;
+        int right_count = array[array[parent].right].childCount + 1;
+        if (left_count > right_count + 1 || left_count + 1 < right_count)
+        {
+            current = parent;
+            need_rebalance = true;
+            break;
+        }
+
+        current = parent;
+    }
+
+    if (need_rebalance)
+        rebalance_helper(current);
 }
 
 template <typename T>
 void BTree<T>::shift_right(int index, int right_index)
 {
-    cout << "shifting right from index: " << index << " by " << right_index << endl;
     int start = array[array[array[index].parent].parent].left;
     // shift all elements to the right by 3 elements
     for (int i = 0; i < array.size(); i += 1)
@@ -138,7 +239,19 @@ int BTree<T>::right_insert(T value, int parent, int current)
 }
 
 template <typename T>
-int BTree<T>::insert(T value)
+bool BTree<T>::is_valid_node(int index)
+{
+    return index != -1 && array[index].parent != -1;
+}
+
+template <typename T>
+bool BTree<T>::is_leaf_node(int index)
+{
+    return (array[index].left == -1 || array[array[index].left].parent == -1) && (array[index].right == -1 || array[array[index].right].parent == -1);
+}
+
+template <typename T>
+int BTree<T>::insert_helper(T value)
 {
     int insert_height = 100;
     int insert_index = -1;
@@ -212,7 +325,7 @@ int BTree<T>::insert(T value)
     }
 
     // if the height is even, pre-insert children for space efficiency
-    if (insert_index != -1 && insert_height % 2 == 0)
+    if (insert_index != -1 && insert_height % 2 == 0 && array[insert_index].left == -1 && array[insert_index].right == -1)
     {
         Node<T> left(0, insert_height - 1);
         Node<T> right(0, insert_height - 1);
@@ -222,8 +335,6 @@ int BTree<T>::insert(T value)
 
         auto right_pos = array.insert(array.begin() + insert_index + 2, right);
         array[insert_index].right = right_pos - array.begin();
-
-        cout << "insert children at index: " << array[insert_index].left << " and " << array[insert_index].right << endl;
     }
 
     if (leave_height > insert_height)
@@ -231,84 +342,165 @@ int BTree<T>::insert(T value)
         leave_height = insert_height;
     }
 
-    cout << "Parent: " << array[insert_index].parent << endl;
-    cout << "Left: " << array[insert_index].left << endl;
-    cout << "Right: " << array[insert_index].right << endl;
-
-    return insert_index; // return -1 if insertion fails
+    return insert_index;
 }
 
 template <typename T>
-void BTree<T>::remove(T value)
+int BTree<T>::remove_helper(T value)
 {
     if (search(value) == -1)
     {
-        return;
+        return -1;
     }
 
     int index = -1;
+    int return_index = -1;
     int current = root;
-    
+
     while (current != -1)
     {
-        if (array[current].childCount != 0)
-            array[current].childCount--;
         if (array[current].data == value)
         {
+            return_index = array[current].parent;
             index = current;
             break;
         }
         else if (value < array[current].data)
         {
+            if (array[current].childCount > 0)
+            {
+                array[current].childCount--;
+            }
             current = array[current].left;
         }
         else
         {
+            if (array[current].childCount > 0)
+            {
+                array[current].childCount--;
+            }
             current = array[current].right;
         }
     }
 
-    current = index;
-    while (current != -1)
+    // if it is leaf, just delete it.
+    if (is_leaf_node(index))
     {
-        // This means both children is valid
-        if (array[current].left != -1 && array[current].right != -1)
+        array[index].data = -1;
+        array[index].parent = -1;
+        return return_index;
+    }
+
+    // find a value between left and right child and replace the current node with it, we prioritize the the branch
+    // with more children so that we can save memory transfer in potential rebalance
+    int left_count = is_valid_node(array[index].left) ? array[array[index].left].childCount : 0;
+    int right_count = is_valid_node(array[index].right) ? array[array[index].right].childCount : 0;
+    bool has_leaf = false;
+    int replace_index = index;
+    if (left_count > right_count) // find a node from left branch
+    {
+        while (replace_index != -1)
         {
-            if (array[array[current].left].parent == -1 && array[array[current].right].parent == -1)
+            if (array[replace_index].childCount > 0)
             {
-                array[current].data = -1;
-                array[current].parent = -1;
-                break;
+                array[replace_index].childCount--;
             }
 
-            if (array[array[current].left].childCount > array[array[current].right].childCount)
+            if (!is_valid_node(array[replace_index].left))
             {
-                array[current].data = array[array[current].left].data;
-                current = array[current].left;
+                array[replace_index].parent = -1;
+                array[replace_index].data = -1;
+                break;
             }
             else
             {
-                array[current].data = array[array[current].right].data;
-                current = array[current].right;
+                array[replace_index].data = array[array[replace_index].left].data;
             }
-        }
-        else if (array[current].left == -1 && array[current].right != -1)
-        {
-            array[current].data = array[array[current].right].data;
-            current = array[current].right;
-        }
-        else if (array[current].left != -1 && array[current].right == -1)
-        {
-            array[current].data = array[array[current].left].data;
-            current = array[current].left;
-        }
-        else
-        {
-            array[current].data = -1;
-            array[current].parent = -1;
-            break;
+
+            if (is_valid_node(array[array[replace_index].left].right))
+            {
+                has_leaf = true;
+                array[array[replace_index].left].childCount--;
+                replace_index = array[array[replace_index].left].right;
+                break;
+            }
+
+            replace_index = array[replace_index].left;
+            index = replace_index;
         }
     }
+    else // find a node from right branch
+    {
+        while (replace_index != -1)
+        {
+            if (array[replace_index].childCount > 0)
+            {
+                array[replace_index].childCount--;
+            }
+
+            if (!is_valid_node(array[replace_index].right))
+            {
+                array[replace_index].parent = -1;
+                array[replace_index].data = -1;
+                break;
+            }
+            else
+            {
+                array[replace_index].data = array[array[replace_index].right].data;
+            }
+
+            if (is_valid_node(array[array[replace_index].right].left))
+            {
+                has_leaf = true;
+                array[array[replace_index].right].childCount--;
+                replace_index = array[array[replace_index].right].left;
+                break;
+            }
+
+            replace_index = array[replace_index].right;
+            index = replace_index;
+        }
+    }
+
+    if (has_leaf)
+    {
+        while (replace_index != -1)
+        {
+            if (array[replace_index].childCount > 0)
+            {
+                array[replace_index].childCount--;
+            }
+
+            if (is_valid_node(array[replace_index].right) && is_valid_node(array[replace_index].left))
+            {
+                if (array[array[replace_index].right].childCount > array[array[replace_index].left].childCount)
+                {
+                    replace_index = array[replace_index].right;
+                }
+                else
+                {
+                    replace_index = array[replace_index].left;
+                }
+            }
+            else if (is_valid_node(array[replace_index].right))
+            {
+                replace_index = array[replace_index].right;
+            }
+            else if (is_valid_node(array[replace_index].left))
+            {
+                replace_index = array[replace_index].left;
+            }
+            else
+            {
+                array[index].data = array[replace_index].data;
+                array[replace_index].parent = -1;
+                array[replace_index].data = -1;
+                break;
+            }
+        }
+    }
+
+    return return_index;
 }
 
 // This function will return the index of element if found, otherwise -1
@@ -387,7 +579,7 @@ void BTree<T>::print_tree()
         {
             cout << setw(4) << array[children[i]].data;
             if (array[children[i]].parent != -1)
-                cout << "(" << array[children[i]].height << ", " << array[children[i]].childCount << ")";
+                cout << "(" << array[array[children[i]].parent].data << ", " << array[children[i]].height << ", " << array[children[i]].childCount << ")";
             for (int j = 0; j < array[children[i]].height - leave_height; ++j)
             {
                 cout << "  ";
@@ -410,6 +602,22 @@ void BTree<T>::print_tree()
         }
         level += 1;
     }
+}
+
+template <typename T>
+int BTree<T>::insert(T value)
+{
+    int index = insert_helper(value);
+    rebalance(index);
+    return search(value);
+}
+
+template <typename T>
+void BTree<T>::remove(T value)
+{
+    int index = remove_helper(value);
+    if (index != -1)
+        rebalance(index);
 }
 
 template <typename T>

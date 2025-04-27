@@ -3,8 +3,9 @@
 
 void insert_to_tree(BTree<int>* tree, int num)
 {
+    cout << "Insert " << num << endl;
     int index = tree->insert(num);
-    cout << "Inserted " << num << " at index: " << index << std::endl;
+    cout << "Insert at index: " << index << endl;
     tree->print_array();
     tree->print_tree();
     cout << "------------------------" << endl;
@@ -13,8 +14,9 @@ void insert_to_tree(BTree<int>* tree, int num)
 
 void remove_from_tree(BTree<int>* tree, int num)
 {
+    cout << "Remove " << num << endl;
     tree->remove(num);
-    cout << "Removed " << num << endl;
+
     tree->print_array();
     tree->print_tree();
     cout << "------------------------" << endl;
@@ -24,28 +26,13 @@ void remove_from_tree(BTree<int>* tree, int num)
 int main()
 {
     BTree<int> tree;
-    insert_to_tree(&tree, 10);
-    insert_to_tree(&tree, 20);
-    insert_to_tree(&tree, 5);
-    insert_to_tree(&tree, 15);
-    insert_to_tree(&tree, 25);
-    insert_to_tree(&tree, 30);
-    insert_to_tree(&tree, 18);
-    insert_to_tree(&tree, 1);
-    insert_to_tree(&tree, 7);
-    insert_to_tree(&tree, 3);
-    insert_to_tree(&tree, 4);
-    insert_to_tree(&tree, -1);
-    insert_to_tree(&tree, -4);
 
-    cout << "Index of 20: " << tree.search(20) << endl;
-    cout << "Index of 7: " << tree.search(7) << endl;
+    for(int i = 0; i < 100000; ++i)
+    {
+        tree.insert(i);
+    }
 
-    remove_from_tree(&tree, -1);
-    remove_from_tree(&tree, 3);
-    remove_from_tree(&tree, 20);
-    remove_from_tree(&tree, 30);
-    remove_from_tree(&tree, -100);
+    tree.print_tree();
 
     return 0;
 }

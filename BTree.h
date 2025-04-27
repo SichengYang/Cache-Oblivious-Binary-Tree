@@ -2,7 +2,7 @@
 #define BTREE_H
 
 #include "Node.h"
-#include "PackMemoryArray.h"
+// #include "PackMemoryArray.h"
 
 // library for temprary use
 using namespace std;
@@ -28,12 +28,17 @@ class BTree
     // PackMemoryArray<T> array; // uncomment if finished
 
     // Function to rebalance the tree after insertion or deletion
-    void rebalance(int index);
+    void rebalance_helper(int index);
+    void rebalance(int index); // Function to rebalance the tree after insertion or deletion
 
     void shift_right(int index, int right_index); // Function to shift elements to the right in the array
     int left_insert(T value, int parrent, int current); // Function to insert a new node int the left subtree
     int right_insert(T value, int parrent, int current); // Function to insert a new node in the right subtree
+    bool is_valid_node(int index); // Function to check if a node is valid (not deleted)
+    bool is_leaf_node(int index); // Function to check if a node is a leaf node
 
+    int insert_helper(T value);
+    int remove_helper(T value);
 public:
     BTree();
     ~BTree();
