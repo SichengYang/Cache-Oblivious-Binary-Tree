@@ -1,6 +1,6 @@
 #include "BTree.h"
 
-// debug purpose
+// debug and printing purpose
 using namespace std;
 #include <iostream>
 #include <iomanip>
@@ -49,7 +49,7 @@ void BTree<T>::rebalance_helper(int index)
     int left_child = array[array[index].left].childCount + 1;
     int right_child = array[array[index].right].childCount + 1;
     int average = array[index].childCount / 2;
-    if (left_child > right_child + 1 || left_child + 1 < right_child)
+    if (left_child > right_child * 4 || left_child * 4 < right_child)
     {
         int balance_count = 0;
         if (left_child > right_child)
@@ -105,7 +105,7 @@ void BTree<T>::rebalance(int index)
 
         int left_count = array[array[parent].left].childCount + 1;
         int right_count = array[array[parent].right].childCount + 1;
-        if (left_count > right_count + 1 || left_count + 1 < right_count)
+        if (left_count > right_count * 4 || left_count * 4 < right_count)
         {
             current = parent;
             need_rebalance = true;
@@ -607,6 +607,11 @@ void BTree<T>::print_tree()
 template <typename T>
 int BTree<T>::insert(T value)
 {
+    int search_result = search(value);
+    if(search_result != -1)
+    {
+        return search_result;
+    }
     int index = insert_helper(value);
     rebalance(index);
     return search(value);
@@ -618,6 +623,12 @@ void BTree<T>::remove(T value)
     int index = remove_helper(value);
     if (index != -1)
         rebalance(index);
+}
+
+template <typename T>
+int BTree<T>::get_height()
+{
+    return 100 - leave_height;
 }
 
 template <typename T>

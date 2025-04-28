@@ -46,6 +46,7 @@ public:
     int insert(T value);
     void remove(T value);
     int search(T value);
+    int get_height();
 
     void print_tree(); // Function to print the tree structure (for debugging purposes)
     void print_array(); // Function to print the array structure (for debugging purposes)
