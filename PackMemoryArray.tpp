@@ -27,24 +27,11 @@ template <typename T>
 int PackMemoryArray<T>::findNearestGap(int pos)
 {
     bool found = false;
-    int start = getSegmentNumber(pos);
-    int gap_before = 0;
+    //int start = getSegmentNumber(pos);
     int gap_after = 0;
     while (found == false)
     {
-        if (pos - gap_before >= 0)
-        {
-            if (exist[pos - gap_before] == false)
-            {
-                found = true;
-                return pos - gap_before;
-            }
-            else
-            {
-                gap_before++;
-            }
-        }
-        else if (pos + gap_after <= 2 * capacity - 1)
+        if (pos + gap_after <= 2 * capacity - 1)
         {
             if (exist[pos + gap_after] == false)
             {
@@ -71,29 +58,38 @@ int PackMemoryArray<T>::getSegmentNumber(int pos)
 }
 
 template <typename T>
-T *PackMemoryArray<T>::add(T value)
+T PackMemoryArray<T>::add(T value)
 {
-    int pos = search(value);
-    if (pos < 0)
-    {
-        pos = -pos - 1;
+    int pos=0;
+    if(ncount==0){
+        store[0]=value;
+        exist[0]=true;
+        ncount++;
     }
+    else{
+    pos = search(value);
+    cout<<"pos="<<pos<<endl;
     int gap_pos = findNearestGap(pos);
+    cout<<"gap_pos="<<gap_pos<<endl;
     if (gap_pos < 0)
     {
         cout<<"Error! in fundtion :add(), gap position not found."<<endl;
+        return value;
     }
-    else if (gap_pos > pos)
+    else if (gap_pos >= pos)
     { // Move this chunck of data afterward
+        // cout<<"store["<<pos+1<<"]: "<<store[pos+1]<<" store["<<pos<<"]: "<<store[pos]<<endl;//DEBUG:
         memmove(store + pos + 1, store + pos, sizeof(T) * (gap_pos - pos));
+        memmove(exist + pos + 1, exist + pos, sizeof(bool) * (gap_pos - pos));
+        store[pos]=value;
+        exist[pos]=true;
+        // cout<<"store["<<pos+1<<"]:"<<store[pos+1]<<" store["<<pos<<"]: "<<store[pos]<<endl;//DEBUG:
     }
-    else
-    { // Move this chunck of data forward
-        memmove(store + gap_pos, store + gap_pos + 1, sizeof(T) * (pos - gap_pos));
-    }
-
     ncount++;
     resize(); // If the operation causes the array needs to be resized
+    }
+    // cout<<"Add value"<<value<<" to:"<< pos<<endl;//DEBUG:
+    return value;
 }
 
 template <typename T>
@@ -104,30 +100,36 @@ int PackMemoryArray<T>::decide_segment(int value)
 }
 // Binary Search, return the index of the element found
 template <typename T>
-int *PackMemoryArray<T>::search(T value)
+int PackMemoryArray<T>::search(T value)
 {
-    int low = 0, high = size;
-    while (low <= high)
-    {
-        int mid = ((high - low) / 2) + low;
-        if (store[mid] == value && exist[mid] == true)
-        {
-            return mid;
+    for(int i=0;i<8;i++){
+        if(exist[segment_size*i]==false){
+            cout<<"exist[segment_size*i]==false"<<endl;
         }
-        if (store[mid] > value)
-            high = mid - 1;
-        else
-            low = mid + 1;
+        if(store[segment_size*i]>value || exist[segment_size*i]==false){
+            for(int j=0;j<segment_size;i++){
+                if(store[segment_size*(i-1)+j]==value && exist[segment_size*(i-1)+j]==true){
+                    return segment_size*(i-1)+j;
+                }
+                else if((store[segment_size*(i-1)+j]>value && exist[segment_size*(i-1)+j]==true)){
+                    return segment_size*(i-1)+j-1;
+                }
+                else if(exist[segment_size*(i-1)+j]==false){
+                    return segment_size*(i-1)+j;
+                }
+                
+            }
+        }
     }
-    return -high - 1; // Not found, return the position that is insertable n, as -(n+1)
+    return -1;
 }
 
 template <typename T>
-T *PackMemoryArray<T>::remove(T value)
+T PackMemoryArray<T>::remove(T value)
 {
     T temp;
     int index = search(value);
-    if (index >=0)
+    if (store[index]==value && exist[index]==true)
     {
         exist[index] = false;
         ncount -= 1;
@@ -154,9 +156,9 @@ int PackMemoryArray<T>::getSegment_size()
 }
 
 template <typename T>
-int PackMemoryArray<T>::printPMA()
+void PackMemoryArray<T>::printPMA()
 {
-     cout<<" Segement Size= "<<segment_size<<" Size = "<<ncount<<" Capacity= "<<capacity<<endl;
+    cout<<"Segement Size= "<<segment_size<<" Size = "<<ncount<<" Capacity= "<<capacity<<endl;
     for (int i = 0; i < capacity*2; i++)
     {
         if((i%segment_size)==0){
@@ -176,14 +178,14 @@ int PackMemoryArray<T>::printPMA()
 template <typename T>
 void PackMemoryArray<T>::resize()
 {
-    cout<<"Resize!"<<endl;
-    if (getSize() > (capacity * 3 / 4))
+    if (getNcount() > (capacity * 3 / 4))
     { // Too many elements in the array, we need to reallocate them with proper gap between the elements
+        cout<<"Resize!"<<endl;
         T* temp_new_store=new T[capacity * 2];
-        T* temp_new_exist=new T[capacity * 2];
+        bool* temp_new_exist=new bool[capacity * 2];
         for(int i=0; i< capacity*2/segment_size;i++){
             memcpy(temp_new_store+2*i*segment_size, store+i*segment_size, segment_size * sizeof(T));
-            memcpy(temp_new_exist+2*i*segment_size, exist+i*segment_size, segment_size * sizeof(T));
+            memcpy(temp_new_exist+2*i*segment_size, exist+i*segment_size, segment_size * sizeof(bool));
         }
         delete[] store;
         delete[] exist;
@@ -194,7 +196,7 @@ void PackMemoryArray<T>::resize()
     }
 }
 template <typename T>
-T *PackMemoryArray<T>::operator[](int index)
+T PackMemoryArray<T>::operator[](int index)
 {
     int temp_count=0;
     if (index > ncount || index < 0)

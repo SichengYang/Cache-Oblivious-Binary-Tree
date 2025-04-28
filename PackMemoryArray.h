@@ -29,24 +29,23 @@ public:
     PackMemoryArray(int N); // Default size
     ~PackMemoryArray();
     //Operation:Insert, Remove, Get by index
-    T *add(T value);
-    T *remove(T value);
-    T *operator[](int index);
+    T add(T value);
+    T remove(T value);
+    T operator[](int index);
     // Get variables
     int getNcount();
     int getSegment_size();
-    int printPMA();
+    void printPMA();
 private:
 // Supprting Functions
     void resize(); // Function to resize if space is limited
-    void relanace();
-    int getSize(); //TKTK: do we really need this?
+    //void relanace();
     int decide_segment(int value);
     int findNearestGap(int pos);
     int getSegmentNumber(int pos);
     
     // Search
-    int *search(T value);
+    int search(T value);
 };
 
 #include "PackMemoryArray.tpp"

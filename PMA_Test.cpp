@@ -13,6 +13,13 @@ int main()
     }
 
     file << "elements,height\n";
+    //pma.printPMA();
+    pma.add(1);
+    pma.add(1);
+    pma.add(1);
+    pma.add(1);
+    // pma.add(1);
+    // pma.add(1);
     pma.printPMA();
     // for(int i = 0; i < 200000; ++i)
     // {
