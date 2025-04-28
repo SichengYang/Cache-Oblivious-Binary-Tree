@@ -1,15 +1,18 @@
 #include "PackMemoryArray.h"
 #include <math.h>
-#define c 2 // N elements stored in O(N) memory. we set the memory size to be 2N (elements + gaps)
+// debug and printing purpose
+using namespace std;
+#include <iostream>
+#include <iomanip>
+// N elements stored in O(N) memory. we set the memory size to be 2N (elements + gaps)
 template <typename T>
 PackMemoryArray<T>::PackMemoryArray(int N)
-    : ncount(0)
-    : capacity(N)
+    : ncount(0),capacity(N)
 {
 
-    store = new T[N * c];              // Using cN memory space
-    exist = new bool[N * c];           // Using cN memory space
-    segment_size = decide_segment(N*c);  // N/8, in total we have 16 segments with c=2
+    store = new T[N * 2];              // Using cN memory space
+    exist = new bool[N * 2];           // Using cN memory space
+    segment_size = decide_segment(N*2);  // N/8, in total we have 16 segments with c=2
     temp_buffer = new T[segment_size]; // Buffer to temporarily store the elements to be suffled in a segment
 }
 
@@ -41,7 +44,7 @@ int PackMemoryArray<T>::findNearestGap(int pos)
                 gap_before++;
             }
         }
-        else if (pos + gap_after <= c * N - 1)
+        else if (pos + gap_after <= 2 * capacity - 1)
         {
             if (exist[pos + gap_after] == false)
             {
@@ -111,7 +114,7 @@ int *PackMemoryArray<T>::search(T value)
         {
             return mid;
         }
-        if (store[mid] > target)
+        if (store[mid] > value)
             high = mid - 1;
         else
             low = mid + 1;
@@ -124,9 +127,9 @@ T *PackMemoryArray<T>::remove(T value)
 {
     T temp;
     int index = search(value);
-    if (index != -1)
+    if (index >=0)
     {
-        exist[mid] = false;
+        exist[index] = false;
         ncount -= 1;
         // TKTK: If the operation causes the array needs to be resized
         resize();
@@ -154,14 +157,14 @@ template <typename T>
 int PackMemoryArray<T>::printPMA()
 {
      cout<<" Segement Size= "<<segment_size<<" Size = "<<ncount<<" Capacity= "<<capacity<<endl;
-    for (int i = 0; i < capacity*c; i++)
+    for (int i = 0; i < capacity*2; i++)
     {
         if((i%segment_size)==0){
             cout<<endl<<"Segment"<<i/segment_size<<":";
         }
         if (exist[i] == true)
         {
-            cout<<" ["<<i<<"]="store[i];
+            cout<<" ["<<i<<"]="<<store[i];
         }
         else{
             cout<<" ["<<i<<"]=--";
@@ -174,11 +177,11 @@ template <typename T>
 void PackMemoryArray<T>::resize()
 {
     cout<<"Resize!"<<endl;
-    if (self.getSize() > (capacity * 3 / 4))
+    if (getSize() > (capacity * 3 / 4))
     { // Too many elements in the array, we need to reallocate them with proper gap between the elements
-        temp_new_store=new T[capacity * 2];
-        temp_new_exist=new T[capacity * 2];
-        for(int i=0; i< N*C/segment_size;i++){
+        T* temp_new_store=new T[capacity * 2];
+        T* temp_new_exist=new T[capacity * 2];
+        for(int i=0; i< capacity*2/segment_size;i++){
             memcpy(temp_new_store+2*i*segment_size, store+i*segment_size, segment_size * sizeof(T));
             memcpy(temp_new_exist+2*i*segment_size, exist+i*segment_size, segment_size * sizeof(T));
         }
@@ -200,7 +203,7 @@ T *PackMemoryArray<T>::operator[](int index)
     }
     else 
     {
-        for(int i=0; i<capacity*c;i++){
+        for(int i=0; i<capacity*2;i++){
             if(exist[i]==true){
                 if(temp_count==index){
                     return store[i];
