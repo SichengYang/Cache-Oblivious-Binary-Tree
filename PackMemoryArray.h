@@ -15,18 +15,18 @@ public:
     int ncount;
     // Segment size
     int segment_size;
-    // TKTK
-    int nchunks;
-    int nlevels; 
+    // Expected Capacity
+    int capacity;
 //Arrays:
     // Array that stores the value
     T * store;
     // Array that indicate if the element is valid
     bool * exist;
+    //Maintain an array as the buffer that hold the value of the data being shuffled in the segment
+    T * temp_buffer;
     
 //Constructors:
-    PackMemoryArray(); // Default size
-    PackMemoryArray(T* v_store, bool* v_exist, int ncount, int segment_size, int nchunks, int nlevels); //Constructor with array
+    PackMemoryArray(int N); // Default size
     ~PackMemoryArray();
     //Operation:Insert, Remove, Get by index
     T *add(T value);
@@ -41,7 +41,10 @@ private:
     void resize(); // Function to resize if space is limited
     void relanace();
     int getSize(); //TKTK: do we really need this?
-    int *decide_segment(T value);
+    int decide_segment(int value);
+    int findNearestGap(int pos);
+    int getSegmentNumber(int pos);
+    
     // Search
     int *search(T value);
 };
