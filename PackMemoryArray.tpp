@@ -4,8 +4,6 @@
 template <typename T>
 PackMemoryArray<T>::PackMemoryArray(int N)
     : ncount(0)
-    : nchunks(0)
-    : nlevels(0)
     : capacity(N)
 {
 
@@ -94,10 +92,11 @@ T *PackMemoryArray<T>::add(T value)
     ncount++;
     resize(); // If the operation causes the array needs to be resized
 }
+
 template <typename T>
 int PackMemoryArray<T>::decide_segment(int value)
 {
-    // Each segment should be log2(n) where n is the total size
+    // Each segment should be c*N/8 where N is the total data size
     return value/8;
 }
 // Binary Search, return the index of the element found
@@ -194,16 +193,20 @@ void PackMemoryArray<T>::resize()
 template <typename T>
 T *PackMemoryArray<T>::operator[](int index)
 {
-    if (index > size || index < 0)
+    int temp_count=0;
+    if (index > ncount || index < 0)
     {
         return NULL;
     }
-    else if (exist[index] == false)
+    else 
     {
-        return NULL;
-    }
-    else
-    {
-        return store[index];
+        for(int i=0; i<capacity*c;i++){
+            if(exist[i]==true){
+                if(temp_count==index){
+                    return store[i];
+                }
+                temp_count++;
+            }
+        }
     }
 }
