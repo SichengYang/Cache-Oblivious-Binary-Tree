@@ -31,7 +31,7 @@ public:
     ~PackMemoryArray();
     //Operation:Insert, Remove, Get by index
     bool insert(T value);
-    T remove(T value);
+    int remove(T value);
     T operator[](int index);
     
     // Get variables
@@ -39,8 +39,8 @@ public:
     int getSegment_size();
     void printPMA();
     void setDebug(bool var);
-private:
-// Supprting Functions
+    int search(T value);
+private: // Supprting Functions
     void resize(); // Function to resize if space is limited
     //void relanace();
     int decide_segment(int value);
@@ -49,7 +49,6 @@ private:
     bool isSegmentTooFull(int pos);
     bool match(T value, int pos);
     // Search
-    int search(T value);
     int insertSearch(T value);
     void shuffle();
 };

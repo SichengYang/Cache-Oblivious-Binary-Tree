@@ -269,17 +269,17 @@ int PackMemoryArray<T>::insertSearch(T value)
 }
 
 template <typename T>
-T PackMemoryArray<T>::remove(T value)
+int PackMemoryArray<T>::remove(T value)
 {
     T temp;
     int index = search(value);
-    if (store[index]==value && exist[index]==true)
+    if (index!=-1)
     {
         exist[index] = false;
         ncount -= 1;
         // TKTK: If the operation causes the array needs to be resized
         resize();
-        return temp;
+        return index;
     }
     // Element not fount
     else
@@ -346,7 +346,7 @@ T PackMemoryArray<T>::operator[](int index)
     int temp_count=0;
     if (index > ncount || index < 0)
     {
-        return NULL;
+        return -1;
     }
     else 
     {
