@@ -70,14 +70,14 @@ T PackMemoryArray<T>::insert(T value)
         cout<<"Error! in fundtion :add(), insert position not found."<<endl;
         return value;
     }
-    cout<<"DEBUG: pos="<<pos<<endl;
+    //cout<<"DEBUG: pos="<<pos<<endl;
     //We want to check if the segment is too full
     if(segment_ncount[(int)(pos/segment_size)]==segment_size){
         //shuffle needed
-        cout<<"DEBUG: suffle needed for "<<segment_ncount[(int)(pos/segment_size)]<<" = "<<segment_size<<endl;
+        //cout<<"DEBUG: suffle needed for "<<segment_ncount[(int)(pos/segment_size)]<<" = "<<segment_size<<endl;
         shuffle();
         pos = insertSearch(value);
-        cout<<"DEBUG: pos="<<pos<<endl;
+        //cout<<"DEBUG: pos="<<pos<<endl;
     }
     if(pos<0){
         cout<<"Error! in fundtion :add(), insert position not found."<<endl;
@@ -85,7 +85,7 @@ T PackMemoryArray<T>::insert(T value)
     }
     else{
         int gap_pos = findNearestGap(pos);
-        cout<<"DEBUG: gap_pos="<<gap_pos<<endl;
+        //cout<<"DEBUG: gap_pos="<<gap_pos<<endl;
         memmove(store + pos + 1, store + pos, sizeof(T) * (gap_pos - pos));
         memmove(exist + pos + 1, exist + pos, sizeof(bool) * (gap_pos - pos));
         store[pos]=value;
@@ -102,8 +102,8 @@ template <typename T>
 void PackMemoryArray<T>::shuffle(){
     int valid_index=0;
     int distribute_size=ceil(((double)ncount)/8);
-    cout<<"DEBUG: shuffle() distribute_size= "<<distribute_size<<" ncount="<<ncount<<endl;
-    cout<<"DEBUG: shuffle() capacity*2= "<<capacity*2<<endl;
+    //cout<<"DEBUG: shuffle() distribute_size= "<<distribute_size<<" ncount="<<ncount<<endl;
+    //cout<<"DEBUG: shuffle() capacity*2= "<<capacity*2<<endl;
     //printPMA();
     //Collect
     T* temp_store=new T[ncount];
