@@ -25,18 +25,20 @@ public:
     //Maintain an array as the buffer that hold the value of the data being shuffled in the segment
     T * temp_buffer;
     int * segment_ncount;
+    bool debug_mode;
 //Constructors:
     PackMemoryArray(int N); // Default size
     ~PackMemoryArray();
     //Operation:Insert, Remove, Get by index
-    T insert(T value);
+    bool insert(T value);
     T remove(T value);
     T operator[](int index);
-
+    
     // Get variables
     int getNcount();
     int getSegment_size();
     void printPMA();
+    void setDebug(bool var);
 private:
 // Supprting Functions
     void resize(); // Function to resize if space is limited

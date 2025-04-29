@@ -16,7 +16,9 @@ PackMemoryArray<T>::PackMemoryArray(int N)
     memset(exist, false, N*2);
     segment_size = decide_segment(N*2);  // N/8, in total we have 16 segments with c=2
     segment_ncount = new int[8](); // Buffer to temporarily store the elements to be suffled in a segment
+    debug_mode=false;
 }
+
 
 template <typename T>
 PackMemoryArray<T>::~PackMemoryArray()
@@ -24,6 +26,13 @@ PackMemoryArray<T>::~PackMemoryArray()
     delete[] store;
     delete[] exist;
     delete[] segment_ncount;
+}
+
+
+template <typename T>
+void PackMemoryArray<T>::setDebug(bool var)
+{
+    debug_mode=var;
 }
 template <typename T>
 int PackMemoryArray<T>::findNearestGap(int pos)
@@ -61,49 +70,60 @@ int PackMemoryArray<T>::getSegmentNumber(int pos)
 }
 
 template <typename T>
-T PackMemoryArray<T>::insert(T value)
+bool PackMemoryArray<T>::insert(T value)
 {
     int pos=0;
     //Find the position to insert
     pos = insertSearch(value);
     if(pos<0){
-        cout<<"Error! in fundtion :add(), insert position not found."<<endl;
-        return value;
+        cout<<" Error! in fundtion :add(), insert position not found."<<endl;
+        return false;
     }
-    //cout<<"DEBUG: pos="<<pos<<endl;
+    if(debug_mode){
+    cout<<"DEBUG: insert="<<value<<" pos="<<pos;
+    }
     //We want to check if the segment is too full
     if(segment_ncount[(int)(pos/segment_size)]==segment_size){
-        //shuffle needed
-        //cout<<"DEBUG: suffle needed for "<<segment_ncount[(int)(pos/segment_size)]<<" = "<<segment_size<<endl;
+        //shuffle 
+        if(debug_mode){
+        cout<<" DEBUG: suffle needed for" <<segment_ncount[(int)(pos/segment_size)]<<"=  "<<segment_size<<endl;}
         shuffle();
         pos = insertSearch(value);
-        //cout<<"DEBUG: pos="<<pos<<endl;
+        if(debug_mode){
+        cout<<"DEBUG: pos="<<pos ;
+        }
     }
     if(pos<0){
-        cout<<"Error! in fundtion :add(), insert position not found."<<endl;
-        return value;
+        cout<<" Error! in fundtion :add(), insert position not found."<<endl;
+        return false;
     }
     else{
         int gap_pos = findNearestGap(pos);
-        //cout<<"DEBUG: gap_pos="<<gap_pos<<endl;
+        if(gap_pos<0){
+            cout<<"Error! in fundtion :add(), gap position =-1"<<endl;
+            return false;
+        }
+        if(debug_mode){
+        cout<<" DEBUG: gap_pos="<<gap_pos<<endl;
+        }
         memmove(store + pos + 1, store + pos, sizeof(T) * (gap_pos - pos));
         memmove(exist + pos + 1, exist + pos, sizeof(bool) * (gap_pos - pos));
         store[pos]=value;
         exist[pos]=true;
         ncount++;
-        resize();
         segment_ncount[(int)(pos/segment_size)]++;
+        resize();
     }
     // cout<<"Add value"<<value<<" to:"<< pos<<endl;//DEBUG:
-    return value;
+    return true;
 }
 
 template <typename T>
 void PackMemoryArray<T>::shuffle(){
     int valid_index=0;
     int distribute_size=ceil(((double)ncount)/8);
-    //cout<<"DEBUG: shuffle() distribute_size= "<<distribute_size<<" ncount="<<ncount<<endl;
-    //cout<<"DEBUG: shuffle() capacity*2= "<<capacity*2<<endl;
+    // cout<<"DEBUG: shuffle() distribute_size= "<<distribute_size<<" ncount="<<ncount<<endl;
+    // cout<<"DEBUG: shuffle() capacity*2= "<<capacity*2<<endl;
     //printPMA();
     //Collect
     T* temp_store=new T[ncount];
@@ -242,7 +262,7 @@ int PackMemoryArray<T>::insertSearch(T value)
                 }
             }
             //if all the element in i segment is smaller than value, then insert it at the end of the array
-            return segment_size*(i);
+            return segment_size*(i+1)-1;
         }
     }
     return -1;
@@ -282,7 +302,7 @@ int PackMemoryArray<T>::getSegment_size()
 template <typename T>
 void PackMemoryArray<T>::printPMA()
 {
-    cout<<"Segement Size= "<<segment_size<<" Size = "<<ncount<<" Capacity= "<<capacity<<endl;
+    cout<<"============Segement Size= "<<segment_size<<" Size = "<<ncount<<" Capacity= "<<capacity<<"============"<<endl;
     for (int i = 0; i < capacity*2; i++)
     {
         if((i%segment_size)==0){
@@ -297,7 +317,6 @@ void PackMemoryArray<T>::printPMA()
         }
     }
     cout<<endl;
-    cout<<"???"<<endl;
 }
 
 template <typename T>
