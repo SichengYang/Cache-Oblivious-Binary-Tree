@@ -6,7 +6,7 @@ int main()
 {
     BTree<int> tree;
 
-    std::ofstream file("output.csv");
+    std::ofstream file("height_output.csv");
     if (!file.is_open()) {
         std::cerr << "Failed to open the file!" << std::endl;
         return 1;
