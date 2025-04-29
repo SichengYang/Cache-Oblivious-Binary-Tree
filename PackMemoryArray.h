@@ -24,14 +24,15 @@ public:
     bool * exist;
     //Maintain an array as the buffer that hold the value of the data being shuffled in the segment
     T * temp_buffer;
-    
+    int * segment_ncount;
 //Constructors:
     PackMemoryArray(int N); // Default size
     ~PackMemoryArray();
     //Operation:Insert, Remove, Get by index
-    T add(T value);
+    T insert(T value);
     T remove(T value);
     T operator[](int index);
+
     // Get variables
     int getNcount();
     int getSegment_size();
@@ -43,9 +44,12 @@ private:
     int decide_segment(int value);
     int findNearestGap(int pos);
     int getSegmentNumber(int pos);
-    
+    bool isSegmentTooFull(int pos);
+    bool match(T value, int pos);
     // Search
     int search(T value);
+    int insertSearch(T value);
+    void shuffle();
 };
 
 #include "PackMemoryArray.tpp"

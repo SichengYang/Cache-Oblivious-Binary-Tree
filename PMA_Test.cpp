@@ -2,9 +2,10 @@
 #include <iostream>
 #include <fstream>
 
+
 int main()
 {
-    PackMemoryArray<int> pma(8);
+    PackMemoryArray<int> pma(16);
 
     std::ofstream file("output.csv");
     if (!file.is_open()) {
@@ -14,13 +15,18 @@ int main()
 
     file << "elements,height\n";
     //pma.printPMA();
-    pma.add(1);
-    pma.add(1);
-    pma.add(1);
-    pma.add(1);
-    // pma.add(1);
-    // pma.add(1);
+    for(int i=0;i<18;i++){
+        //cout<<"!!! insert: "<<2*i<<endl;
+        pma.insert(2*i);
+    }
+    for(int i=0;i<18;i++){
+        //cout<<"!!! insert: "<<i+1<<endl;
+        pma.insert(2*i+1);
+    }
     pma.printPMA();
+    pma.insert(36);
+    pma.printPMA();
+    //pma.printPMA();
     // for(int i = 0; i < 200000; ++i)
     // {
     //     pma.add(1);
