@@ -30,8 +30,8 @@ public:
     PackMemoryArray(int N); // Default size
     ~PackMemoryArray();
     //Operation:Insert, Remove, Get by index
-    bool insert(T value);
-    int remove(T value);
+    int insert(int position, T value);
+    int remove(int index);
     T operator[](int index);
     
     // Get variables
@@ -39,8 +39,9 @@ public:
     int getSegment_size();
     void printPMA();
     void setDebug(bool var);
-    int search(T value);
+    // int search(T value);
 private: // Supprting Functions
+    void resizeCheck();
     void resize(); // Function to resize if space is limited
     //void relanace();
     int decide_segment(int value);
@@ -51,6 +52,8 @@ private: // Supprting Functions
     // Search
     int insertSearch(T value);
     void shuffle();
+    int searchPosition(int index);
+    int insertInEmptySpot(int pma_position, int position,T value);
 };
 
 #include "PackMemoryArray.tpp"

@@ -1,85 +1,80 @@
 #include "PackMemoryArray.h"
 #include <iostream>
 #include <fstream>
-
+#include <vector>
+#include <random>
+#include <time.h>
+using namespace std;
 int main()
 {
-    PackMemoryArray<int> pma(16);
-    //Check Insert
-    bool error_found = false;
-    for (int i = 0; i < 30; i++)
+    // Random number
+    random_device rd;                         // obtain a random number from hardware
+    mt19937 gen(rd());                        // seed the generator
+    int initial_size=16000;
+    PackMemoryArray<int> pma(initial_size);
+    // Check Insert
+    vector<int> array;
+    int test_size = 200000;
+    //Generate Random inputs
+    vector<int> index_array;
+    vector<int> value_array;
+    //Debug mode
+    bool print_array_pma=false;
+    for (int i = 0; i < test_size; i++)
     {
-        //cout << "!!! insert: " << 2 * i << endl;
-        if (pma.insert(3 * i) == false)
-        {
-            pma.printPMA();
-            error_found = true;
-            break;
-        };
+        uniform_int_distribution<> distr1(0, i);
+        index_array.push_back(distr1(gen));
+        uniform_int_distribution<> distr2(0, 100);
+        value_array.push_back(distr2(gen));
     }
-    if (error_found != true)
+    if(print_array_pma){
+        for (auto i : index_array)
+            cout << i << " ";
+        cout<<endl;
+        for (auto i : value_array)
+            cout << i << " ";
+        cout<<endl;
+    }
+    //Set up Timer
+    float timer1=0;
+    float timer2=0;
+    pma.insert(0, 0);
+    array.insert(array.begin(), 0);
+    const clock_t begin_time1 = clock();
+    for (int i = 0; i < test_size; i++)
     {
+        pma.insert(index_array[i], value_array[i]);
+    }
+    timer1=float( clock () - begin_time1 ) /  CLOCKS_PER_SEC;
+    cout<<"Done for pma"<<endl;
+    const clock_t begin_time2 = clock();
+    for (int i = 0; i < test_size; i++)
+    {
+        array.insert(array.begin() + index_array[i]+1, value_array[i]);
+    }
+    timer2=float( clock () - begin_time2 ) /  CLOCKS_PER_SEC;
+    cout<<"Done for vector"<<endl;
+    if(print_array_pma){
         pma.printPMA();
-        for (int i = 0; i < 30; i++)
-        {
-            // cout<<"!!! insert: "<<i+1<<endl;
-            if (pma.insert(3 * i+1) == false)
-            {
-                pma.printPMA();
-                error_found = true;
-                break;
-            };
-        }
+        cout << "Array:" << endl;
+        for (auto i : array)
+            cout << i << " ";
+        cout << endl;
     }
-    if (error_found != true)
+    //Validation check
+    bool found_error = false;
+    for (int i = 0; i < test_size; i++)
     {
-        pma.printPMA();
-        for (int i = 0; i < 30; i++)
+        if (pma[i] != array[i])
         {
-            // cout<<"!!! insert: "<<i+1<<endl;
-            if (pma.insert(3 * i+2) == false)
-            {
-                pma.printPMA();
-                error_found = true;
-                break;
-            };
+            found_error = true;
+            cout << "Error for " << i << " " << pma[i] << endl;
         }
     }
-    //Check []
-    pma.printPMA();
-    cout<<"pma[67] = "<<pma[67]<<endl;//should be 67
-    cout<<"pma[8] = "<<pma[8]<<endl; //should be 8
-    cout<<"pma[91] = "<<pma[91]<<endl; //should be -1 (DNE)
-    cout<<"pma[101] = "<<pma[101]<<endl; //should be -1 (DNE)
-    //Validation Check for insert
-    bool insert_valid=true;
-    for(int i=0;i<90;i++){
-        if(pma[i]!=i){
-            cout<<"Error Found! at i = "<<i<<" with pma[]="<<pma[i]<<endl;
-            insert_valid==false;
-            break;
-        }
+    if (found_error != true)
+    {
+        cout << "VALID! for test case size: " << test_size <<" Initial pma size:"<<initial_size<<endl;
+        cout<< "Time: (pma) "<<timer1<<" (vector) "<<timer2<<endl;
     }
-    if(insert_valid){
-        cout<<"Insert Valid check"<<endl;
-    }
-    //Check search, output the actual position
-    cout<<"Search for 10: "<<pma.search(10)<<endl;
-    cout<<"Search for 1: "<<pma.search(1)<<endl;
-    cout<<"Search for 53: "<<pma.search(53)<<endl;
-    cout<<"Search for 101: "<<pma.search(101)<<endl;
-    cout<<"Search for 83: "<<pma.search(83)<<endl;
-    cout<<"Search for 99: "<<pma.search(99)<<endl;
-    //Check Remove
-    cout<<"After Remove:"<<endl;
-    pma.remove(10);
-    pma.remove(1);
-    pma.remove(53);
-    pma.remove(83);
-    cout<<"Search for 10: "<<pma.search(10)<<endl;
-    cout<<"Search for 1: "<<pma.search(1)<<endl;
-    cout<<"Search for 53: "<<pma.search(53)<<endl;
-    cout<<"Search for 83: "<<pma.search(83)<<endl;
-    pma.printPMA();
     return 0;
 }
