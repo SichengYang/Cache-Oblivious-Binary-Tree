@@ -16,7 +16,7 @@ int main()
     file << "elements,time\n";
 
     double time_count = 0;
-    for(int i = 0; i < 250001; ++i)
+    for(int i = 0; i < 200001; ++i)
     {
         auto start = std::chrono::high_resolution_clock::now();
 
