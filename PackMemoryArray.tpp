@@ -26,71 +26,7 @@ PackMemoryArray<T>::~PackMemoryArray()
     delete[] exist;
     delete[] segment_ncount;
 }
-
-template <typename T>
-void PackMemoryArray<T>::setDebug(bool var)
-{
-    debug_mode = var;
-}
-template <typename T>
-int PackMemoryArray<T>::findNearestGap(int pos)
-{
-    bool found = false;
-    // int start = getSegmentNumber(pos);
-    int gap_after = 0;
-    while (found == false)
-    {
-        if (pos + gap_after <= 2 * capacity - 1)
-        {
-            // cout<<pos+gap_after<<endl;
-            if (exist[pos + gap_after] == false)
-            {
-                found = true;
-                return pos + gap_after;
-            }
-            else
-            {
-                gap_after++;
-            }
-        }
-        else
-        {
-            break;
-        }
-    }
-    return -1;
-}
-
-template <typename T>
-int PackMemoryArray<T>::getSegmentNumber(int pos)
-{
-    return (int)(pos / segment_size);
-}
-template <typename T>
-int PackMemoryArray<T>::insertInEmptySpot(int pma_position, int position, T value){
-    // Check if we can distrubute to other segements
-    bool segment_distribute = true;
-    if (segment_distribute)
-    {
-        int current_segement_number = getSegmentNumber(pma_position);
-        if (current_segement_number != 7 && exist[(current_segement_number + 1) * segment_size] == false)
-        {
-            exist[(current_segement_number + 1) * segment_size] = true;
-            store[(current_segement_number + 1) * segment_size] = value;
-            ncount++;
-            segment_ncount[current_segement_number + 1]++;
-            resizeCheck();
-            return position;
-        }
-    }
-    exist[pma_position] = true;
-    store[pma_position] = value;
-    ncount++;
-    segment_ncount[getSegmentNumber(pma_position)]++;
-    resizeCheck();
-    return position;
-}
-
+//Operation : Insert with position(in the external array, not index in store[])
 template <typename T>
 int PackMemoryArray<T>::insert(int position, T value)
 {
@@ -164,7 +100,144 @@ int PackMemoryArray<T>::insert(int position, T value)
     }
     return position;
 }
+//Operation: Remove with position(in the external array, not index in store[])
+template <typename T>
+int PackMemoryArray<T>::remove(int position)
+{
+    T temp;
+    int index = searchPosition(position);
+    if (index != -1)
+    {
+        exist[index] = false;
+        ncount -= 1;
+        segment_ncount[getSegmentNumber(index)]--;
+        return index;
+    }
+    // Element not fount
+    else
+    {
+        return -1;
+    }
+}
+//Operation: Get with position(in the external array, not index in store[])
+template <typename T>
+T PackMemoryArray<T>::operator[](int index)
+{
+    int pma_index=searchPosition(index);
+    //cout<<"pma_index: "<<pma_index<<endl;
+    if(pma_index==-1){
+        return -1;
+    }
+    else{
+        return store[pma_index];
+    }
+}
+// Get variables
+template <typename T>
+void PackMemoryArray<T>::setDebug(bool var)
+{
+    debug_mode = var;
+}
 
+template <typename T>
+int PackMemoryArray<T>::getNcount()
+{
+    return ncount;
+}
+
+template <typename T>
+int PackMemoryArray<T>::getSegment_size()
+{
+    return segment_size;
+}
+
+template <typename T>
+void PackMemoryArray<T>::printPMA()
+{
+    cout << "============Segement Size= " << segment_size << " Size = " << ncount << " Capacity= " << capacity << "============" << endl;
+    for (int i = 0; i < capacity * 2; i++)
+    {
+        if ((i % segment_size) == 0)
+        {
+            cout << endl
+                 << "Segment [" << i / segment_size << "] with [" << segment_ncount[i / segment_size] << "] elements:";
+        }
+        if (exist[i] == true)
+        {
+            cout << " [" << i << "]=" << store[i];
+        }
+        else
+        {
+            cout << " [" << i << "]=--";
+        }
+    }
+    cout << endl;
+}
+
+// Return the pma index of the next nearest gap(empty position)
+template <typename T>
+int PackMemoryArray<T>::findNearestGap(int pos)
+{
+    bool found = false;
+    // int start = getSegmentNumber(pos);
+    int gap_after = 0;
+    while (found == false)
+    {
+        if (pos + gap_after <= 2 * capacity - 1)
+        {
+            // cout<<pos+gap_after<<endl;
+            if (exist[pos + gap_after] == false)
+            {
+                found = true;
+                return pos + gap_after;
+            }
+            else
+            {
+                gap_after++;
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
+    return -1;
+}
+
+// Return the segment number of the corresponding pma index
+template <typename T>
+int PackMemoryArray<T>::getSegmentNumber(int pos)
+{
+    return (int)(pos / segment_size);
+}
+
+// Insert the element in a empty index spot, return the corresponding external index
+template <typename T>
+int PackMemoryArray<T>::insertInEmptySpot(int pma_position, int position, T value){
+    // Check if we can distrubute to other segements
+    bool segment_distribute = true;
+    if (segment_distribute)
+    {
+        int current_segement_number = getSegmentNumber(pma_position);
+        if (current_segement_number != 7 && exist[(current_segement_number + 1) * segment_size] == false)
+        {
+            exist[(current_segement_number + 1) * segment_size] = true;
+            store[(current_segement_number + 1) * segment_size] = value;
+            ncount++;
+            segment_ncount[current_segement_number + 1]++;
+            resizeCheck();
+            return position;
+        }
+    }
+    exist[pma_position] = true;
+    store[pma_position] = value;
+    ncount++;
+    segment_ncount[getSegmentNumber(pma_position)]++;
+    resizeCheck();
+    return position;
+}
+
+// Shuffle the array to keep gaps between each segments
 template <typename T>
 void PackMemoryArray<T>::shuffle()
 {
@@ -207,12 +280,15 @@ void PackMemoryArray<T>::shuffle()
     // cout<<"aftershuffle:"<<endl;
 }
 
+// Return the number of segment size
 template <typename T>
 int PackMemoryArray<T>::decide_segment(int value)
 {
     // Each segment should be c*N/8 where N is the total data size
     return value / 8;
 }
+
+// Check if value is in position pos
 template <typename T>
 bool PackMemoryArray<T>::match(T value, int pos)
 {
@@ -275,6 +351,7 @@ int PackMemoryArray<T>::searchPosition(int index)
     return -1;
 }
 
+// Return the index of seaching the element value. Used as an debug function
 template <typename T>
 int PackMemoryArray<T>::insertSearch(T value)
 {
@@ -336,58 +413,8 @@ int PackMemoryArray<T>::insertSearch(T value)
     return -1;
 }
 
-template <typename T>
-int PackMemoryArray<T>::remove(int position)
-{
-    T temp;
-    int index = searchPosition(position);
-    if (index != -1)
-    {
-        exist[index] = false;
-        ncount -= 1;
-        segment_ncount[getSegmentNumber(index)]--;
-        return index;
-    }
-    // Element not fount
-    else
-    {
-        return -1;
-    }
-}
 
-template <typename T>
-int PackMemoryArray<T>::getNcount()
-{
-    return ncount;
-}
-template <typename T>
-int PackMemoryArray<T>::getSegment_size()
-{
-    return segment_size;
-}
 
-template <typename T>
-void PackMemoryArray<T>::printPMA()
-{
-    cout << "============Segement Size= " << segment_size << " Size = " << ncount << " Capacity= " << capacity << "============" << endl;
-    for (int i = 0; i < capacity * 2; i++)
-    {
-        if ((i % segment_size) == 0)
-        {
-            cout << endl
-                 << "Segment [" << i / segment_size << "] with [" << segment_ncount[i / segment_size] << "] elements:";
-        }
-        if (exist[i] == true)
-        {
-            cout << " [" << i << "]=" << store[i];
-        }
-        else
-        {
-            cout << " [" << i << "]=--";
-        }
-    }
-    cout << endl;
-}
 
 template <typename T>
 void PackMemoryArray<T>::resizeCheck()
@@ -418,16 +445,4 @@ void PackMemoryArray<T>::resize()
     exist = temp_new_exist;
     segment_size = segment_size * 2;
     capacity = capacity * 2;
-}
-template <typename T>
-T PackMemoryArray<T>::operator[](int index)
-{
-    int pma_index=searchPosition(index);
-    //cout<<"pma_index: "<<pma_index<<endl;
-    if(pma_index==-1){
-        return -1;
-    }
-    else{
-        return store[pma_index];
-    }
 }
