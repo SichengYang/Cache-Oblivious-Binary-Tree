@@ -413,9 +413,7 @@ int PackMemoryArray<T>::insertSearch(T value)
     return -1;
 }
 
-
-
-
+// Check if the array is above the bar of "almost full"
 template <typename T>
 void PackMemoryArray<T>::resizeCheck()
 {
@@ -424,6 +422,8 @@ void PackMemoryArray<T>::resizeCheck()
         resize();
     }
 }
+
+// Function to resize if space is limited
 template <typename T>
 void PackMemoryArray<T>::resize()
 {
