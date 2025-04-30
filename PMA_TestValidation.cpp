@@ -4,9 +4,18 @@
 #include <vector>
 #include <random>
 #include <time.h>
+#include <chrono>
 using namespace std;
 int main()
 {
+    //Search test
+    std::ofstream file("search_outputPMA.csv");
+    if (!file.is_open())
+    {
+        std::cerr << "Failed to open the file!" << std::endl;
+        return 1;
+    }
+    file << "elements,time\n";
     // Random number
     random_device rd;                         // obtain a random number from hardware
     mt19937 gen(rd());                        // seed the generator
@@ -48,6 +57,7 @@ int main()
     timer1=float( clock () - begin_time1 ) /  CLOCKS_PER_SEC;
     cout<<"Done for pma"<<endl;
     const clock_t begin_time2 = clock();
+    
     for (int i = 0; i < test_size; i++)
     {
         array.insert(array.begin() + index_array[i]+1, value_array[i]);
