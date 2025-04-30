@@ -15,21 +15,24 @@ int main()
     }
 
     file << "elements,time\n";
-    for (int i = 0; i < 300001; ++i)
+    double time_count = 0;
+    for (int i = 0; i < 200000; ++i)
     {
         tree.insert(rand());
 
+        auto start = std::chrono::high_resolution_clock::now();
+        tree.search(rand());
+        auto end = std::chrono::high_resolution_clock::now();
+        double duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+
+        time_count += duration;
+
         if ((i % 1000) == 0)
         {
-            auto start = std::chrono::high_resolution_clock::now();
-
-            tree.search(rand());
-
-            auto end = std::chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-            
-            file << i << "," << duration << "\n";
-            cout << "Search with " << i << " elements, time: " << duration << endl;
+            double average_time = time_count / 1000;
+            file << i << "," << average_time << "\n";
+            cout << "Search with " << i << " elements, time: " << average_time << endl;
+            time_count = 0;
         }
     }
 
