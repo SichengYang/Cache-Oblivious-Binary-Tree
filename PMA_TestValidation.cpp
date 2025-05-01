@@ -11,7 +11,7 @@ void test_function(int initial_size, int test_size, ofstream& file){
     random_device rd;                         // obtain a random number from hardware
     mt19937 gen(rd());                        // seed the generator
 
-    PackMemoryArray<int> pma(initial_size);
+    PackMemoryArray<int> pma;
     // Check Insert
     vector<int> array;
     //Generate Random inputs

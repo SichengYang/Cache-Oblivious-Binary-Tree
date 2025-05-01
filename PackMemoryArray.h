@@ -29,7 +29,7 @@ public:
     // Boolean variable to turn on/off the debug printing
     bool debug_mode;
 // Constructors:
-    PackMemoryArray(int N); // N is the initial pma array size
+    PackMemoryArray(); // N is the initial pma array size
     ~PackMemoryArray();
     //Operation : Insert with position(in the external array, not index in store[])
     int insert(int position, T value);
@@ -39,9 +39,10 @@ public:
     T& operator[](int position);
     
     // Get variables
-    int getNcount();
+    int size();
     int getSegment_size();
     void printPMA();
+    void printPMAdata();
     void setDebug(bool var);
 
 private: 

@@ -7,10 +7,10 @@ using namespace std;
 #include <cstring>
 // N elements stored in O(N) memory. we set the memory size to be 2N (elements + gaps)
 template <typename T>
-PackMemoryArray<T>::PackMemoryArray(int N)
-    : ncount(0), capacity(N)
+PackMemoryArray<T>::PackMemoryArray()
+    : ncount(0), capacity(32)
 {
-
+    int N=32;
     store = (T*)malloc(sizeof(T)*(N * 2));    // Using cN memory space
     exist = new bool[N * 2]; // Using cN memory space
     memset(exist, false, N * 2);
@@ -30,6 +30,11 @@ PackMemoryArray<T>::~PackMemoryArray()
 template <typename T>
 int PackMemoryArray<T>::insert(int position, T value)
 {
+    //cout<<"insert()"<<endl;
+    if(sizeof(value)!=sizeof(int) && debug_mode){
+        printPMAdata();
+        cout<<"position: "<< position<<endl;
+    }
     int pma_position=0;
     // The pma array is empty insert the first element
     if (ncount == 0 && position == 0)
@@ -158,7 +163,7 @@ template <typename T>
 T& PackMemoryArray<T>::operator[](int index)
 {
     int pma_index = searchPosition(index);
-    // cout<<"pma_index: "<<pma_index<<endl;
+    //cout<<"operator[]"<<endl;
     if (pma_index == -1)
     {
         return store[0];
@@ -176,7 +181,7 @@ void PackMemoryArray<T>::setDebug(bool var)
 }
 
 template <typename T>
-int PackMemoryArray<T>::getNcount()
+int PackMemoryArray<T>::size()
 {
     return ncount;
 }
@@ -209,7 +214,28 @@ void PackMemoryArray<T>::printPMA()
     }
     cout << endl;
 }
-
+template <typename T>
+void PackMemoryArray<T>::printPMAdata()
+{
+    cout << "============Segement Size= " << segment_size << " Size = " << ncount << " Capacity= " << capacity << "============" << endl;
+    for (int i = 0; i < capacity * 2; i++)
+    {
+        if ((i % segment_size) == 0)
+        {
+            cout << endl
+                 << "Segment [" << i / segment_size << "] with [" << segment_ncount[i / segment_size] << "] elements:";
+        }
+        if (exist[i] == true)
+        {
+            cout << " [" << i << "]=" << store[i].data;
+        }
+        else
+        {
+            cout << " [" << i << "]=--";
+        }
+    }
+    cout << endl;
+}
 // Return the pma index of the next nearest gap(empty position)
 template <typename T>
 int PackMemoryArray<T>::findNearestGap(int pos)
@@ -349,7 +375,7 @@ int PackMemoryArray<T>::searchPosition(int index)
     {
         if (debug_mode)
         {
-            cout << "Error: index: " << index << ">=ncountt: " << ncount << endl;
+            cout << "Error: index: " << index << " >=ncountt: " << ncount << endl;
         }
         return -1;
     }
@@ -457,7 +483,7 @@ int PackMemoryArray<T>::insertSearch(T value)
 template <typename T>
 void PackMemoryArray<T>::resizeCheck()
 {
-    if (getNcount() >= capacity * 2 * 3 / 4)
+    if (size() >= capacity * 2 * 3 / 4)
     {
         resize();
     }

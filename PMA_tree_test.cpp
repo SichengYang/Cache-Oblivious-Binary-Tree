@@ -3,6 +3,7 @@
 
 void insert_to_tree(PMATree<int>* tree, int num)
 {
+    cout << "Insert " << num << std::endl;
     int index = tree->insert(num);
     cout << "Inserted " << num << " at index: " << index << std::endl;
     tree->print_array();
