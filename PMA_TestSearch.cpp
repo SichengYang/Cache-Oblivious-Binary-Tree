@@ -23,7 +23,7 @@ int main()
     PackMemoryArray<int> pma(initial_size);
     // Check Insert
     vector<int> array;
-    int test_size = 500000;
+    int test_size = 200000;
     //Generate Random inputs
     vector<int> index_array;
     vector<int> value_array;
@@ -53,7 +53,7 @@ int main()
     for (int i = 0; i < test_size; i++)
     {
         pma.insert(index_array[i], value_array[i]);
-        if ((i % 1000) == 0)
+        if ((i % 2000) == 0)
         {
             uniform_int_distribution<> distr3(0, i);
             int temp_index=distr3(gen);
@@ -64,7 +64,7 @@ int main()
             auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
             
             file << i << "," << duration << "\n";
-            cout << "Insert with " << i << " elements, time: " << duration << endl;
+            cout << "Search with " << i << " elements, time: " << duration << endl;
         }
 
     }

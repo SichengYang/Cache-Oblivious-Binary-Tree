@@ -23,7 +23,7 @@ int main()
     PackMemoryArray<int> pma(initial_size);
     // Check Insert
     vector<int> array;
-    int test_size = 200000;
+    int test_size = 500000;
     //Generate Random inputs
     vector<int> index_array;
     vector<int> value_array;
@@ -31,10 +31,12 @@ int main()
     bool print_array_pma=false;
     for (int i = 0; i < test_size; i++)
     {
-        uniform_int_distribution<> distr1(0, i);
+        uniform_int_distribution<> distr1(0, i+1);
         index_array.push_back(distr1(gen));
+        //index_array.push_back(i);
         uniform_int_distribution<> distr2(0, 100);
         value_array.push_back(distr2(gen));
+        //value_array.push_back(i);
     }
     if(print_array_pma){
         for (auto i : index_array)
@@ -52,15 +54,17 @@ int main()
     const clock_t begin_time1 = clock();
     for (int i = 0; i < test_size; i++)
     {
+        //cout<<"i = "<<i<<" index_array[i]= "<<index_array[i]<<" value_array[i]="<< value_array[i]<<endl;
+        //pma.printPMA();
         pma.insert(index_array[i], value_array[i]);
+        
     }
     timer1=float( clock () - begin_time1 ) /  CLOCKS_PER_SEC;
     cout<<"Done for pma"<<endl;
     const clock_t begin_time2 = clock();
-    
     for (int i = 0; i < test_size; i++)
     {
-        array.insert(array.begin() + index_array[i]+1, value_array[i]);
+        array.insert(array.begin() + index_array[i], value_array[i]);
     }
     timer2=float( clock () - begin_time2 ) /  CLOCKS_PER_SEC;
     cout<<"Done for vector"<<endl;
