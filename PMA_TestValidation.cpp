@@ -99,11 +99,11 @@ int main()
     file << "elements,pma_size, pma_time, vector_time\n";
     int initial_size[7]= {1600,16000,32000};
     int test_size[8] = {80000,100000,120000,140000,160000,180000,200000};
-    // for(int i=0; i<7;i++){
-    //     for(int j=0;j<7;j++){
-    //         test_function(initial_size[i], test_size[j], file);
-    //     }
-    // }
-    test_function(initial_size[0], test_size[0], file);
+    for(int i=0; i<7;i++){
+        for(int j=0;j<7;j++){
+            test_function(initial_size[i], test_size[j], file);
+        }
+    }
+
     return 0;
 }
