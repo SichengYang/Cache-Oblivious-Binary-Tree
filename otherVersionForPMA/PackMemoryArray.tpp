@@ -11,7 +11,7 @@ PackMemoryArray<T>::PackMemoryArray(int N)
     : ncount(0), capacity(N)
 {
 
-    store = (T*)malloc(sizeof(T)*(N * 2));    // Using cN memory space
+    store = new T[N * 2];    // Using cN memory space
     exist = new bool[N * 2]; // Using cN memory space
     memset(exist, false, N * 2);
     segment_size = decide_segment(N * 2); // N/8, in total we have 16 segments with c=2
@@ -22,7 +22,7 @@ PackMemoryArray<T>::PackMemoryArray(int N)
 template <typename T>
 PackMemoryArray<T>::~PackMemoryArray()
 {
-    free(store);
+    delete[] store;
     delete[] exist;
     delete[] segment_ncount;
 }
@@ -284,7 +284,7 @@ void PackMemoryArray<T>::shuffle()
     // cout<<"DEBUG: shuffle() capacity*2= "<<capacity*2<<endl;
     // printPMA();
     // Collect
-    T *temp_store=(T*)malloc(sizeof(T)*ncount);
+    T *temp_store = new T[ncount];
     for (int i = 0; i < capacity * 2; i++)
     {
         if (exist[i] == true)
@@ -314,8 +314,6 @@ void PackMemoryArray<T>::shuffle()
             }
         }
     }
-    free(temp_store);
-    temp_store=NULL;
     // cout<<"aftershuffle:"<<endl;
 }
 
@@ -472,7 +470,7 @@ void PackMemoryArray<T>::resize()
     {
         cout << "Resize!" << endl;
     }
-    T *temp_new_store = (T*)malloc(sizeof(T)*(capacity * 4));
+    T *temp_new_store = new T[capacity * 4];
     bool *temp_new_exist = new bool[capacity * 4];
     memset(temp_new_exist, false, capacity * 4);
     for (int i = 0; i < capacity * 2 / segment_size; i++)
@@ -480,10 +478,9 @@ void PackMemoryArray<T>::resize()
         memcpy(temp_new_store + 2 * i * segment_size, store + i * segment_size, segment_size * sizeof(T));
         memcpy(temp_new_exist + 2 * i * segment_size, exist + i * segment_size, segment_size * sizeof(bool));
     }
-    free(store);
+    delete[] store;
     delete[] exist;
     store = temp_new_store;
-    temp_new_store=NULL;
     exist = temp_new_exist;
     segment_size = segment_size * 2;
     capacity = capacity * 2;
