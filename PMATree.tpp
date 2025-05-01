@@ -124,7 +124,7 @@ void PMATree<T>::shift_right(int index, int right_index)
 {
     int start = array[array[array[index].parent].parent].left;
     // shift all elements to the right by 3 elements
-    for (int i = 0; i < array.size(); i += 1)
+    for (int i = 0; i < array.getNcount(); i += 1)
     {
         if (array[i].parent >= index)
         {
