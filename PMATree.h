@@ -4,7 +4,6 @@
 #include "Node.h"
 #include "PackMemoryArray.h"
 
-// library for temprary use
 using namespace std;
 #include <vector>
 #include <iostream>
