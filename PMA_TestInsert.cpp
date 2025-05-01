@@ -4,9 +4,18 @@
 #include <vector>
 #include <random>
 #include <time.h>
+#include <chrono>
 using namespace std;
 int main()
 {
+    //Search test
+    std::ofstream file("insert_outputPMA.csv");
+    if (!file.is_open())
+    {
+        std::cerr << "Failed to open the file!" << std::endl;
+        return 1;
+    }
+    file << "elements,time\n";
     // Random number
     random_device rd;                         // obtain a random number from hardware
     mt19937 gen(rd());                        // seed the generator
@@ -14,7 +23,7 @@ int main()
     PackMemoryArray<int> pma(initial_size);
     // Check Insert
     vector<int> array;
-    int test_size = 200000;
+    int test_size = 500000;
     //Generate Random inputs
     vector<int> index_array;
     vector<int> value_array;
@@ -43,38 +52,25 @@ int main()
     const clock_t begin_time1 = clock();
     for (int i = 0; i < test_size; i++)
     {
-        pma.insert(index_array[i], value_array[i]);
-    }
-    timer1=float( clock () - begin_time1 ) /  CLOCKS_PER_SEC;
-    cout<<"Done for pma"<<endl;
-    const clock_t begin_time2 = clock();
-    for (int i = 0; i < test_size; i++)
-    {
-        array.insert(array.begin() + index_array[i]+1, value_array[i]);
-    }
-    timer2=float( clock () - begin_time2 ) /  CLOCKS_PER_SEC;
-    cout<<"Done for vector"<<endl;
-    if(print_array_pma){
-        pma.printPMA();
-        cout << "Array:" << endl;
-        for (auto i : array)
-            cout << i << " ";
-        cout << endl;
-    }
-    //Validation check
-    bool found_error = false;
-    for (int i = 0; i < test_size; i++)
-    {
-        if (pma[i] != array[i])
+        if ((i % 5000) == 0)
         {
-            found_error = true;
-            cout << "Error for " << i << " " << pma[i] << endl;
+            uniform_int_distribution<> distr3(0, i);
+            int temp_index=distr3(gen);
+            auto start = std::chrono::high_resolution_clock::now();
+            pma.insert(index_array[i], value_array[i]);
+
+            auto end = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+            
+            file << i << "," << duration << "\n";
+            cout << "Insert with " << i << " elements, time: " << duration << endl;
         }
+        else{
+            pma.insert(index_array[i], value_array[i]);
+        }
+
+
     }
-    if (found_error != true)
-    {
-        cout << "VALID! for test case size: " << test_size <<" Initial pma size:"<<initial_size<<endl;
-        cout<< "Time: (pma) "<<timer1<<" (vector) "<<timer2<<endl;
-    }
+    
     return 0;
 }

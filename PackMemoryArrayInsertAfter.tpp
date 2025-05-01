@@ -26,12 +26,12 @@ PackMemoryArray<T>::~PackMemoryArray()
     delete[] exist;
     delete[] segment_ncount;
 }
-// Operation : Insert with position(in the external array, not index in store[])
+//Operation : Insert with position(in the external array, not index in store[])
 template <typename T>
 int PackMemoryArray<T>::insert(int position, T value)
 {
-    int pma_position=0;
-    // The pma array is empty insert the first element
+
+    // The pma array is empty
     if (ncount == 0 && position == 0)
     {
         exist[0] = true;
@@ -40,101 +40,67 @@ int PackMemoryArray<T>::insert(int position, T value)
         segment_ncount[0]++;
         return position;
     }
-    // If position equals ncount, append to the last element
-    else if(position == ncount)
+    int pma_position = searchPosition(position);
+    if (debug_mode)
     {
-        int target_segment=-1;
-        for(int i=1; i<8;i++){
-            if(segment_ncount[i]==0){
-                target_segment=i-1;
-                pma_position=target_segment*segment_size;
-                if (debug_mode)
-                {
-                    cout << "DEBUG: pma_position=" << pma_position << " position= " << position << endl;
-                }
-                insertInEmptySpot(pma_position, position, value);
-                break;
-            }
-        }
-        if(target_segment==-1){
-            if(segment_ncount[7]==segment_size){
-                shuffle();
-            }
-                for(int i=0;i<segment_size;i++){
-                    if(exist[7*segment_size+i]==false){
-                        pma_position=7*segment_size+i;
-                        insertInEmptySpot(pma_position, position, value);
-                        break;
-                    }
-                }
-        }
-
+        cout << "DEBUG: pma_position=" << pma_position << " position= " << position << endl;
     }
+    // index is out of range 0-ncount
+    if (pma_position < 0)
+    {
+        cout << "Error: insert index not found: element index range needs to be 0 to " << ncount - 1 << endl;
+        return -1;
+    }
+    pma_position = pma_position + 1;
+    // Check if the position is occupied
+    // pma position is available
+    if (exist[pma_position] == false && pma_position<capacity*2)
+    {
+
+        return insertInEmptySpot(pma_position, position, value);
+    }
+    // pma position is not available
+    // Search for the nearest gap
     else
     {
-        pma_position = searchPosition(position);
-        if (debug_mode)
+        // Find the nearest gap
+        int gap_pos = findNearestGap(pma_position);
+        if (gap_pos < 0)
         {
-            cout << "DEBUG: pma_position=" << pma_position << " position= " << position << endl;
-        }
-        // index is out of range 0-ncount
-        if (pma_position < 0)
-        {
-            cout << "Error: insert index "<<position<<" not found: element index range needs to be 0 to " << ncount << endl;
-            return -1;
-        }
-        // Check if the position is occupied
-        // pma position is available
-        if (exist[pma_position] == false && pma_position < capacity * 2)
-        {
-
-            return insertInEmptySpot(pma_position, position, value);
-        }
-        // pma position is not available
-        // Search for the nearest gap
-        else
-        {
-            // Find the nearest gap
-            int gap_pos = findNearestGap(pma_position);
+            // cout << "Error! in fundtion :add(), gap position =-1" << endl;
+            // Shuffle if needed
+            if (debug_mode)
+            {
+                cout << " DEBUG: suffle needed " << endl;
+            }
+            shuffle();
+            pma_position = searchPosition(position) + 1;
+            if (debug_mode)
+            {
+                cout << "DEBUG: pma_position=" << pma_position;
+            }
+            if(exist[pma_position]==false){
+                return insertInEmptySpot(pma_position, position, value);
+            }
+            gap_pos = findNearestGap(pma_position);
+            //Usually won't happened, there must be gaps after shuffle
             if (gap_pos < 0)
             {
-                // cout << "Error! in fundtion :add(), gap position =-1" << endl;
-                // Shuffle if needed
-                if (debug_mode)
-                {
-                    cout << " DEBUG: suffle needed " << endl;
-                }
-                shuffle();
-                pma_position = searchPosition(position);
-                if (debug_mode)
-                {
-                    cout << "DEBUG: pma_position=" << pma_position;
-                }
-                if (exist[pma_position] == false)
-                {
-                    return insertInEmptySpot(pma_position, position, value);
-                }
-                gap_pos = findNearestGap(pma_position);
-                // Usually won't happened, there must be gaps after shuffle
-                if (gap_pos < 0)
-                {
-                    cout << "Error! in fundtion :add(), gap position =-1" << endl;
-                }
+                cout << "Error! in fundtion :add(), gap position =-1" << endl;
             }
-            
-            memmove(store + pma_position+1, store + pma_position, sizeof(T) * (gap_pos - pma_position));
-            memmove(exist + pma_position+1, exist + pma_position, sizeof(bool) * (gap_pos - pma_position));
+        }
+            memmove(store + pma_position + 1, store + pma_position, sizeof(T) * (gap_pos - pma_position));
+            memmove(exist + pma_position + 1, exist + pma_position, sizeof(bool) * (gap_pos - pma_position));
             store[pma_position] = value;
             exist[pma_position] = true;
             ncount++;
             segment_ncount[getSegmentNumber(gap_pos)]++;
             resizeCheck();
             return position;
-        }
     }
     return position;
 }
-// Operation: Remove with position(in the external array, not index in store[])
+//Operation: Remove with position(in the external array, not index in store[])
 template <typename T>
 int PackMemoryArray<T>::remove(int position)
 {
@@ -153,18 +119,16 @@ int PackMemoryArray<T>::remove(int position)
         return -1;
     }
 }
-// Operation: Get with position(in the external array, not index in store[])
+//Operation: Get with position(in the external array, not index in store[])
 template <typename T>
 T PackMemoryArray<T>::operator[](int index)
 {
-    int pma_index = searchPosition(index);
-    // cout<<"pma_index: "<<pma_index<<endl;
-    if (pma_index == -1)
-    {
+    int pma_index=searchPosition(index);
+    //cout<<"pma_index: "<<pma_index<<endl;
+    if(pma_index==-1){
         return -1;
     }
-    else
-    {
+    else{
         return store[pma_index];
     }
 }
@@ -249,8 +213,7 @@ int PackMemoryArray<T>::getSegmentNumber(int pos)
 
 // Insert the element in a empty index spot, return the corresponding external index
 template <typename T>
-int PackMemoryArray<T>::insertInEmptySpot(int pma_position, int position, T value)
-{
+int PackMemoryArray<T>::insertInEmptySpot(int pma_position, int position, T value){
     // Check if we can distrubute to other segements
     bool segment_distribute = true;
     if (segment_distribute)
@@ -345,8 +308,7 @@ int PackMemoryArray<T>::searchPosition(int index)
 {
     if (index >= ncount || index < 0)
     {
-        if (debug_mode)
-        {
+        if(debug_mode){
             cout << "Error: index: " << index << ">=ncountt: " << ncount << endl;
         }
         return -1;
@@ -466,8 +428,7 @@ template <typename T>
 void PackMemoryArray<T>::resize()
 {
     // Too many elements in the array, we need to reallocate them with proper gap between the elements
-    if (debug_mode)
-    {
+    if(debug_mode){
         cout << "Resize!" << endl;
     }
     T *temp_new_store = new T[capacity * 4];
