@@ -90,17 +90,20 @@ void test_function(int initial_size, int test_size, ofstream& file){
 int main()
 {
     //Export the result into file
-    std::ofstream file("total insertion_outputPMA.csv");
+    std::ofstream file("total insertion_outputPMA111.csv");
     if (!file.is_open())
     {
         std::cerr << "Failed to open the file!" << std::endl;
         return 1;
     }
     file << "elements,pma_size, pma_time, vector_time\n";
-    int initial_size[7]= {16,32,160,320,1600,3200,16000};
-    int test_size = 10000;
-    for(int i=0; i<7;i++){
-        test_function(initial_size[i], test_size, file);
-    }
+    int initial_size[7]= {1600,16000,32000};
+    int test_size[8] = {80000,100000,120000,140000,160000,180000,200000};
+    // for(int i=0; i<7;i++){
+    //     for(int j=0;j<7;j++){
+    //         test_function(initial_size[i], test_size[j], file);
+    //     }
+    // }
+    test_function(initial_size[0], test_size[0], file);
     return 0;
 }

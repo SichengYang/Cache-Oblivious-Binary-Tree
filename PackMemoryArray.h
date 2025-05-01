@@ -36,7 +36,7 @@ public:
     //Operation: Remove with position(in the external array, not index in store[])
     int remove(int position);
     //Operation: Get with position(in the external array, not index in store[])
-    T operator[](int position);
+    T& operator[](int position);
     
     // Get variables
     int getNcount();
