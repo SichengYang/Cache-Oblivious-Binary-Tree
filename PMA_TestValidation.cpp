@@ -97,8 +97,10 @@ int main()
         return 1;
     }
     file << "elements,pma_size, pma_time, vector_time\n";
-    int initial_size=16;
-    int test_size = 50;
-    test_function(initial_size, test_size, file);
+    int initial_size[7]= {16,32,160,320,1600,3200,16000};
+    int test_size = 10000;
+    for(int i=0; i<7;i++){
+        test_function(initial_size[i], test_size, file);
+    }
     return 0;
 }
