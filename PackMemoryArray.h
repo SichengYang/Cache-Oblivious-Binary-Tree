@@ -2,8 +2,8 @@
 #define ARRAY_H
 
 /// @details
-/// This is a custom pack memory array that stores data in several contiguous block of memory. To make the data structure easy to use,
-///
+/// This is a custom pack memory array that stores data in several (in this case 8)contiguous block of memory(segments).
+/// There are gaps between each segments' data. The structure will shuffle or resize if the segments are too full for insertion
 /// @tparam T
 
 template <typename T>
