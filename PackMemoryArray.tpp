@@ -155,13 +155,13 @@ int PackMemoryArray<T>::remove(int position)
 }
 // Operation: Get with position(in the external array, not index in store[])
 template <typename T>
-T PackMemoryArray<T>::operator[](int index)
+T& PackMemoryArray<T>::operator[](int index)
 {
     int pma_index = searchPosition(index);
     // cout<<"pma_index: "<<pma_index<<endl;
     if (pma_index == -1)
     {
-        return -1;
+        return store[0];
     }
     else
     {

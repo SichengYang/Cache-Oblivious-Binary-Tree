@@ -6,24 +6,14 @@
 #include <time.h>
 #include <chrono>
 using namespace std;
-int main()
-{
-    //Search test
-    std::ofstream file("search_outputPMA.csv");
-    if (!file.is_open())
-    {
-        std::cerr << "Failed to open the file!" << std::endl;
-        return 1;
-    }
-    file << "elements,time\n";
+void test_function(int initial_size, int test_size, ofstream& file){
     // Random number
     random_device rd;                         // obtain a random number from hardware
     mt19937 gen(rd());                        // seed the generator
-    int initial_size=16000;
+
     PackMemoryArray<int> pma(initial_size);
     // Check Insert
     vector<int> array;
-    int test_size = 500000;
     //Generate Random inputs
     vector<int> index_array;
     vector<int> value_array;
@@ -89,6 +79,31 @@ int main()
     {
         cout << "VALID! for test case size: " << test_size <<" Initial pma size:"<<initial_size<<endl;
         cout<< "Time: (pma) "<<timer1<<" (vector) "<<timer2<<endl;
+        file<<test_size<<", "<<initial_size<< ", "<<timer1<<", "<<timer2;
     }
+    else{
+        file<<"Error:"<<test_size<<", "<<initial_size<< ", "<<timer1<<", "<<timer2;
+    }
+}
+
+
+int main()
+{
+    //Export the result into file
+    std::ofstream file("total insertion_outputPMA111.csv");
+    if (!file.is_open())
+    {
+        std::cerr << "Failed to open the file!" << std::endl;
+        return 1;
+    }
+    file << "elements,pma_size, pma_time, vector_time\n";
+    int initial_size[7]= {1600,16000,32000};
+    int test_size[8] = {80000,100000,120000,140000,160000,180000,200000};
+    // for(int i=0; i<7;i++){
+    //     for(int j=0;j<7;j++){
+    //         test_function(initial_size[i], test_size[j], file);
+    //     }
+    // }
+    test_function(initial_size[0], test_size[0], file);
     return 0;
 }
