@@ -11,7 +11,9 @@ BTree<T>::BTree() : root(-1), leave_height(100) {}
 template <typename T>
 BTree<T>::~BTree() {}
 
-// Balance the node by checking differene between left and right child. According to the paper, the difference between the left and right should be within the factor of 4 (for binary tree, we choose d = 2).
+// Balance the node by checking differene between left and right child. According to the paper, the difference between the left and 
+// right should be within the factor of 4 (for binary tree, we choose d = 2). This is also a recursive function that will check the 
+// left and right child of the current node and rebalance them if necessary.
 template <typename T>
 void BTree<T>::rebalance_helper(int index)
 {
@@ -46,6 +48,8 @@ void BTree<T>::rebalance_helper(int index)
         return;
     }
 
+    // if both left and right are valid, we check the difference between left and right
+    // if the left or right has more than 4 times difference, we need to rebalance
     int left_child = array[array[index].left].childCount + 1;
     int right_child = array[array[index].right].childCount + 1;
     int average = array[index].childCount / 2;
@@ -75,6 +79,7 @@ void BTree<T>::rebalance_helper(int index)
         rebalance_helper(array[index].right);
 }
 
+// This function will find the first parent that is not balanced and rebalance it by calling the rebalance_helper function
 template <typename T>
 void BTree<T>::rebalance(int index)
 {
@@ -119,6 +124,7 @@ void BTree<T>::rebalance(int index)
         rebalance_helper(current);
 }
 
+// This function will shift all elements to the right by right_index elements
 template <typename T>
 void BTree<T>::shift_right(int index, int right_index)
 {
@@ -141,6 +147,7 @@ void BTree<T>::shift_right(int index, int right_index)
     }
 }
 
+// This function will insert a new node in the left subtree of the parent node
 template <typename T>
 int BTree<T>::left_insert(T value, int parent, int current)
 {
@@ -183,6 +190,7 @@ int BTree<T>::left_insert(T value, int parent, int current)
     return index;
 }
 
+// This function will insert a new node in the right subtree of the parent node
 template <typename T>
 int BTree<T>::right_insert(T value, int parent, int current)
 {
@@ -238,6 +246,8 @@ int BTree<T>::right_insert(T value, int parent, int current)
     return index;
 }
 
+// This function will check if the node is valid (alloated and has a value) by checking if the parent is not -1 and 
+// the passing index is not -1.
 template <typename T>
 bool BTree<T>::is_valid_node(int index)
 {
@@ -337,6 +347,7 @@ int BTree<T>::insert_helper(T value)
         array[insert_index].right = right_pos - array.begin();
     }
 
+    // update the leave height if the new node is a leaf and the height is deeper than the current leave height
     if (leave_height > insert_height)
     {
         leave_height = insert_height;
@@ -357,6 +368,7 @@ int BTree<T>::remove_helper(T value)
     int return_index = -1;
     int current = root;
 
+    // find the node to be deleted and decrease the child count by 1
     while (current != -1)
     {
         if (array[current].data == value)
@@ -462,6 +474,8 @@ int BTree<T>::remove_helper(T value)
         }
     }
 
+    // if we find a leaf to be the parent of the current node, we need to change the leaf to empty and the parent
+    // of current node to this leaf
     if (has_leaf)
     {
         while (replace_index != -1)
@@ -471,6 +485,8 @@ int BTree<T>::remove_helper(T value)
                 array[replace_index].childCount--;
             }
 
+            // check the longest chain of children by examine the condition of left and right children
+            // if both children are valid, we need to check which one has more children
             if (is_valid_node(array[replace_index].right) && is_valid_node(array[replace_index].left))
             {
                 if (array[array[replace_index].right].childCount > array[array[replace_index].left].childCount)
@@ -482,6 +498,7 @@ int BTree<T>::remove_helper(T value)
                     replace_index = array[replace_index].left;
                 }
             }
+            // go to another direction if one of the children is invalid
             else if (is_valid_node(array[replace_index].right))
             {
                 replace_index = array[replace_index].right;
@@ -543,6 +560,8 @@ void BTree<T>::print_tree()
 {
     vector<int> parents;
     vector<int> children;
+    
+    // we first access the root node
     if (root != -1)
     {
         cout << "Root:      ";
@@ -566,6 +585,7 @@ void BTree<T>::print_tree()
         cout << "Tree is empty." << endl;
     }
 
+    // constnatly check the children of the current node and print them out
     int level = 1;
     while (!children.empty())
     {
@@ -607,11 +627,14 @@ void BTree<T>::print_tree()
 template <typename T>
 int BTree<T>::insert(T value)
 {
+    // check if the value is already in the tree
     int search_result = search(value);
     if(search_result != -1)
     {
         return search_result;
     }
+
+    // if the value is not in the tree, insert it
     int index = insert_helper(value);
     rebalance(index);
     return search(value);

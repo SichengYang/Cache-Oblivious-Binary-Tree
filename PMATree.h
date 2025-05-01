@@ -36,16 +36,16 @@ class PMATree
     bool is_valid_node(int index); // Function to check if a node is valid (not deleted)
     bool is_leaf_node(int index); // Function to check if a node is a leaf node
 
-    int insert_helper(T value);
-    int remove_helper(T value);
+    int insert_helper(T value); // helper function for soley inserting a new node and return the index of the new node
+    int remove_helper(T value); // helper function for soley removing a node and return the index of the parent node
 public:
     PMATree();
     ~PMATree();
 
-    int insert(T value);
-    void remove(T value);
-    int search(T value);
-    int get_height();
+    int insert(T value);    // Function to insert a new value into the tree
+    void remove(T value);   // Function to remove a value from the tree
+    int search(T value);    // Function to search for a value in the tree and return its index
+    int get_height();       // Function to get the height of the tree
 
     void print_tree(); // Function to print the tree structure (for debugging purposes)
     void print_array(); // Function to print the array structure (for debugging purposes)
