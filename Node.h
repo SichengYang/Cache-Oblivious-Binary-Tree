@@ -19,6 +19,10 @@ public:
     int parent;
 
     Node(T value, int height); // Constructor to initialize the node with a value and height
+
+    operator int() const {
+        return (int)data;
+    }
 };
 
 #include "Node.tpp"
